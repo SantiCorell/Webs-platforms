@@ -1,0 +1,163 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { supabase } from "@/lib/supabaseClient";
+---
+
+<BaseLayout title="Panel · Dashboard">
+  <div class="min-h-screen bg-gray-100">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <h1 class="font-semibold text-gray-900">
+          Panel de administración
+        </h1>
+
+        <button
+          id="logout"
+          class="text-sm text-red-600 hover:underline"
+        >
+          Cerrar sesión
+        </button>
+      </div>
+    </header>
+
+    <!-- Contenido -->
+    <main class="max-w-7xl mx-auto px-6 py-10 space-y-8">
+
+      <!-- Bienvenida -->
+      <div class="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-900">
+          Bienvenido
+        </h2>
+
+        <p class="text-sm text-gray-600">
+          Has iniciado sesión correctamente en el panel.
+        </p>
+
+        <p class="text-sm">
+          <span class="font-medium text-gray-700">Usuario:</span>
+          <span id="user-email" class="text-gray-900"></span>
+        </p>
+
+        <p class="text-sm">
+          <span class="font-medium text-gray-700">Rol:</span>
+          <span
+            id="user-role"
+            class="inline-block px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
+          ></span>
+        </p>
+      </div>
+
+      <!-- Accesos rápidos -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/admin/club" class="bg-white rounded-xl border border-gray-200 p-5 hover:border-orange-300 hover:shadow-md transition block">
+          <span class="text-sm text-gray-500 block">Configuración</span>
+          <span class="font-semibold text-gray-900">Datos del club</span>
+        </a>
+        <a href="/admin/noticias" class="bg-white rounded-xl border border-gray-200 p-5 hover:border-orange-300 hover:shadow-md transition block">
+          <span class="text-sm text-gray-500 block">Contenido</span>
+          <span class="font-semibold text-gray-900">Noticias</span>
+        </a>
+        <a href="/admin/patrocinadores" class="bg-white rounded-xl border border-gray-200 p-5 hover:border-orange-300 hover:shadow-md transition block">
+          <span class="text-sm text-gray-500 block">Contenido</span>
+          <span class="font-semibold text-gray-900">Patrocinadores</span>
+        </a>
+        <a href="/admin/galeria" class="bg-white rounded-xl border border-gray-200 p-5 hover:border-orange-300 hover:shadow-md transition block">
+          <span class="text-sm text-gray-500 block">Contenido</span>
+          <span class="font-semibold text-gray-900">Galería</span>
+        </a>
+      </div>
+
+      <!-- Contadores -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <p class="text-sm text-gray-500">Noticias publicadas</p>
+          <p id="count-news" class="text-3xl font-bold text-gray-900 mt-1">
+            —
+          </p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <p class="text-sm text-gray-500">Patrocinadores</p>
+          <p id="count-sponsors" class="text-3xl font-bold text-gray-900 mt-1">
+            —
+          </p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-6">
+          <p class="text-sm text-gray-500">Álbumes</p>
+          <p id="count-albums" class="text-3xl font-bold text-gray-900 mt-1">
+            —
+          </p>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { supabase } from "@/lib/supabaseClient";
+
+    // Comprobar sesión
+    const { data: sessionData } = await supabase.auth.getSession();
+
+    if (!sessionData.session) {
+      window.location.href = "/admin/login";
+      throw new Error("No session");
+    }
+
+    const user = sessionData.session.user;
+    document.getElementById("user-email").textContent = user.email;
+
+    // Obtener perfil
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role, club_id")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      document.getElementById("user-role").textContent = "—";
+      document.getElementById("count-news").textContent = "0";
+      document.getElementById("count-sponsors").textContent = "0";
+      document.getElementById("count-albums").textContent = "0";
+      console.error(profileError);
+    } else {
+      document.getElementById("user-role").textContent = profile.role ?? "—";
+      const clubId = profile.club_id;
+
+      const [
+        newsResult,
+        sponsorsResult,
+        albumsResult
+      ] = await Promise.all([
+        supabase
+          .from("news")
+          .select("*", { count: "exact", head: true })
+          .eq("club_id", clubId),
+        supabase
+          .from("sponsors")
+          .select("*", { count: "exact", head: true })
+          .eq("club_id", clubId),
+        supabase
+          .from("albums")
+          .select("*", { count: "exact", head: true })
+          .eq("club_id", clubId)
+      ]);
+
+      document.getElementById("count-news").textContent =
+        String(newsResult.count ?? 0);
+      document.getElementById("count-sponsors").textContent =
+        String(sponsorsResult.count ?? 0);
+      document.getElementById("count-albums").textContent =
+        String(albumsResult.count ?? 0);
+    }
+
+    // Logout
+    document.getElementById("logout").addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      window.location.href = "/admin/login";
+    });
+  </script>
+</BaseLayout>

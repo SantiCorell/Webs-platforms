@@ -1,7 +1,8 @@
 {
-  "name": "",
+  "name": "metrio-web",
   "type": "module",
   "version": "0.0.1",
+  "description": "Plataforma web para clubs deportivos - Metrio",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -9,6 +10,14 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^9.5.2",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.94.0",
     "astro": "^5.17.1"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19"
   }
 }

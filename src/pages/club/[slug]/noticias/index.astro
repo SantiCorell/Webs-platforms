@@ -1,0 +1,87 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import ClubHeader from "../../../../components/ClubHeader.astro";
+import { clubs } from "../../../../data/clubs";
+
+const { slug } = Astro.params;
+const club = clubs[slug];
+
+// MOCK noticias (luego esto vendrá de BD o CMS)
+const news = [
+  {
+    id: 1,
+    title: "Victoria importante del primer equipo",
+    date: "10 Febrero 2026",
+    excerpt: "El primer equipo se impuso en un partido clave que refuerza su posición en la tabla."
+  },
+  {
+    id: 2,
+    title: "Cambio de horarios esta semana",
+    date: "8 Febrero 2026",
+    excerpt: "Por motivos organizativos, algunos entrenamientos cambian de horario esta semana."
+  },
+  {
+    id: 3,
+    title: "Buen papel del Infantil A en el torneo",
+    date: "5 Febrero 2026",
+    excerpt: "El Infantil A firmó una gran actuación en el torneo disputado este fin de semana."
+  }
+];
+---
+
+<BaseLayout title={`Noticias · ${club?.name ?? ""}`}>
+  {club && (
+    <>
+      <!-- HEADER -->
+      <ClubHeader
+        clubName={club.name}
+        slug={slug}
+        logoUrl={club.logo}
+      />
+
+      <!-- HERO SIMPLE -->
+      <section class="bg-gray-900">
+        <div class="max-w-6xl mx-auto px-6 py-12">
+          <h1 class="text-3xl md:text-4xl font-extrabold text-white">
+            Noticias del {club.name}
+          </h1>
+          <p class="text-white/80 mt-2 max-w-2xl">
+            Toda la actualidad del club, resultados, comunicados y novedades.
+          </p>
+        </div>
+      </section>
+
+      <!-- LISTADO -->
+      <section class="bg-gray-100">
+        <div class="max-w-6xl mx-auto px-6 py-14 grid gap-6 md:grid-cols-2">
+
+          {news.map(item => (
+            <article class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition flex flex-col justify-between">
+              <div>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">
+                  {item.title}
+                </h2>
+                <span class="text-sm text-gray-500">
+                  {item.date}
+                </span>
+                <p class="text-gray-600 mt-3">
+                  {item.excerpt}
+                </p>
+              </div>
+
+              <a
+                href={`/club/${slug}/noticias/${item.id}`}
+                class="mt-5 inline-block text-blue-600 font-semibold hover:underline"
+              >
+                Leer noticia →
+              </a>
+            </article>
+          ))}
+
+        </div>
+      </section>
+    </>
+  )}
+</BaseLayout>

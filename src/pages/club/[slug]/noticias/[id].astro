@@ -1,0 +1,87 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import ClubHeader from "../../../../components/ClubHeader.astro";
+import { clubs } from "../../../../data/clubs";
+
+const { slug, id } = Astro.params;
+const club = clubs[slug];
+
+// MOCK de noticias (luego vendrá de BD)
+const newsMap = {
+  1: {
+    title: "Victoria importante del primer equipo",
+    date: "10 Febrero 2026",
+    content: `
+El primer equipo logró una victoria clave en un partido muy disputado que refuerza su posición en la clasificación.
+
+El encuentro estuvo marcado por la intensidad y el compromiso de todos los jugadores, destacando el esfuerzo colectivo y la solidez defensiva.
+
+Desde el club queremos felicitar a jugadores y cuerpo técnico por el trabajo realizado durante la semana.
+    `,
+  },
+  2: {
+    title: "Cambio de horarios esta semana",
+    date: "8 Febrero 2026",
+    content: `
+Por motivos organizativos y de disponibilidad de instalaciones, algunos entrenamientos modificarán su horario habitual durante esta semana.
+
+Rogamos a jugadores y familias que revisen los nuevos horarios y consulten cualquier duda con sus entrenadores.
+    `,
+  },
+  3: {
+    title: "Buen papel del Infantil A en el torneo",
+    date: "5 Febrero 2026",
+    content: `
+El Infantil A firmó una gran actuación en el torneo disputado este fin de semana, compitiendo a un alto nivel frente a equipos de gran entidad.
+
+Más allá de los resultados, destacamos el comportamiento ejemplar y la progresión del grupo.
+    `,
+  },
+};
+
+const article = newsMap[id];
+---
+
+<BaseLayout title={`${article?.title ?? "Noticia"} · ${club?.name ?? ""}`}>
+  {club && article && (
+    <>
+      <!-- HEADER -->
+      <ClubHeader
+        clubName={club.name}
+        slug={slug}
+        logoUrl={club.logo}
+        color={club.color}
+      />
+
+      <!-- CONTENIDO -->
+      <section class="bg-gray-100">
+        <article class="max-w-3xl mx-auto px-6 py-14 bg-white rounded-xl shadow-sm">
+
+          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
+            {article.title}
+          </h1>
+
+          <p class="text-sm text-gray-500 mb-8">
+            {article.date}
+          </p>
+
+          <div class="prose prose-gray max-w-none">
+            {article.content.split("\n").map(p => (
+              <p>{p}</p>
+            ))}
+          </div>
+
+          <a
+            href={`/club/${slug}/noticias`}
+            class="inline-block mt-10 text-blue-600 font-semibold hover:underline"
+          >
+            ← Volver a noticias
+          </a>
+
+        </article>
+      </section>
+    </>
+  )}
+</BaseLayout>

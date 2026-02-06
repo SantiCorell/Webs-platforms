@@ -1,0 +1,1340 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Editor de Noticias · Administración">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50/30">
+
+    <!-- Cabecera de Navegación -->
+    <header class="bg-white/95 backdrop-blur-sm shadow-lg border-b border-neutral-200/80 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <a 
+            href="/admin/noticias" 
+            class="text-neutral-600 hover:text-neutral-900 transition-all duration-300 p-2 hover:bg-neutral-100 rounded-xl group"
+            title="Volver al listado"
+          >
+            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </a>
+          <div class="h-6 w-px bg-gradient-to-b from-transparent via-neutral-300 to-transparent"></div>
+          <div class="flex items-center space-x-3">
+            <div class="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="font-semibold text-neutral-900">Editor de Noticias</h1>
+              <p class="text-xs text-neutral-500">Edita y publica contenido oficial</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+          <div class="hidden lg:flex items-center space-x-3">
+            <div class="text-right">
+              <p class="text-xs font-medium text-neutral-500">Estado</p>
+              <div class="flex items-center space-x-2">
+                <div id="status-indicator" class="h-2 w-2 rounded-full animate-pulse"></div>
+                <span id="status-text" class="text-sm font-medium text-neutral-700">Cargando...</span>
+              </div>
+            </div>
+          </div>
+          
+          <button
+            id="preview-btn"
+            class="hidden md:inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-neutral-100 to-neutral-200 text-neutral-700 font-medium rounded-xl hover:from-white hover:to-neutral-300 transition-all duration-300 shadow-sm hover:shadow border border-neutral-300"
+            title="Vista previa"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            Vista Previa
+          </button>
+
+          <button
+            id="logout"
+            class="px-4 py-2.5 text-sm font-medium text-neutral-700 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-300 flex items-center space-x-2 group"
+          >
+            <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      <!-- Cabecera del Editor -->
+      <div class="mb-10">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between lg:space-x-8">
+          <div class="flex-1">
+            <h2 class="text-3xl md:text-4xl font-bold text-neutral-900 mb-3 bg-gradient-to-r from-neutral-900 to-neutral-700 bg-clip-text text-transparent">
+              Editor de Contenido
+            </h2>
+            <p class="text-neutral-600 max-w-3xl">
+              Edita los detalles de la noticia. Los cambios se guardan automáticamente como borrador.
+            </p>
+          </div>
+          
+          <div class="mt-6 lg:mt-0 flex items-center space-x-4">
+            <div class="text-right hidden md:block">
+              <p class="text-sm text-neutral-500">Última edición</p>
+              <p id="last-edited" class="text-sm font-medium text-neutral-700">--</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-neutral-500">Visitas</p>
+              <p id="views-count" class="text-xl font-bold text-blue-600">--</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor del Formulario -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Área de Edición Principal -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-xl shadow-neutral-200/30 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-neutral-300/50">
+            <div class="px-8 py-6 border-b border-neutral-200 bg-gradient-to-r from-white to-neutral-50">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-neutral-900">Editar Noticia</h3>
+                <div class="flex items-center space-x-2">
+                  <div id="auto-save-indicator" class="text-xs text-emerald-600 font-medium px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-200">
+                    <span class="flex items-center">
+                      <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Guardado
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <form id="news-form" class="p-8">
+              <!-- Título -->
+              <div class="mb-8">
+                <label class="block text-sm font-semibold text-neutral-900 mb-3">
+                  <span class="flex items-center">
+                    Título de la noticia
+                    <span class="text-red-500 ml-1">*</span>
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">Título atractivo y descriptivo (máx. 120 caracteres)</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  required
+                  maxlength="120"
+                  class="w-full rounded-xl border-2 border-neutral-300 px-5 py-4 text-lg font-medium
+                         focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                         transition-all duration-300 hover:border-neutral-400"
+                  placeholder="Ej: El club gana el campeonato regional 2024"
+                />
+                <div class="flex justify-between mt-2">
+                  <span class="text-xs text-neutral-400">Aparecerá en el listado principal</span>
+                  <span id="title-counter" class="text-xs text-neutral-400">0/120</span>
+                </div>
+              </div>
+
+              <!-- Extracto -->
+              <div class="mb-8">
+                <label class="block text-sm font-semibold text-neutral-900 mb-3">
+                  <span class="flex items-center">
+                    Extracto o descripción corta
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">Breve resumen que aparecerá en tarjetas y redes sociales</span>
+                </label>
+                <textarea
+                  name="excerpt"
+                  rows="3"
+                  maxlength="300"
+                  class="w-full rounded-xl border-2 border-neutral-300 px-5 py-4
+                         focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                         transition-all duration-300 hover:border-neutral-400 resize-none"
+                  placeholder="Describe brevemente el contenido de la noticia..."
+                ></textarea>
+                <div class="flex justify-between mt-2">
+                  <span class="text-xs text-neutral-400">Óptimo para SEO y compartir</span>
+                  <span id="excerpt-counter" class="text-xs text-neutral-400">0/300</span>
+                </div>
+              </div>
+
+              <!-- Contenido Principal -->
+              <div class="mb-8">
+                <div class="flex items-center justify-between mb-3">
+                  <label class="block text-sm font-semibold text-neutral-900">
+                    <span class="flex items-center">
+                      Contenido de la noticia
+                      <span class="text-red-500 ml-1">*</span>
+                    </span>
+                    <span class="text-xs text-neutral-500 font-normal">Cuerpo completo del artículo</span>
+                  </label>
+                  <div class="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      id="format-bold"
+                      class="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                      title="Negrita"
+                    >
+                      <span class="font-bold">B</span>
+                    </button>
+                    <button
+                      type="button"
+                      id="format-italic"
+                      class="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                      title="Cursiva"
+                    >
+                      <span class="italic">I</span>
+                    </button>
+                    <button
+                      type="button"
+                      id="format-link"
+                      class="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                      title="Insertar enlace"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <textarea
+                  name="content"
+                  rows="12"
+                  required
+                  class="w-full rounded-xl border-2 border-neutral-300 px-5 py-4 font-sans
+                         focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                         transition-all duration-300 hover:border-neutral-400 resize-y min-h-[300px]"
+                  placeholder="Escribe el contenido completo de la noticia aquí..."
+                ></textarea>
+                <div class="flex justify-between mt-2">
+                  <span class="text-xs text-neutral-400">Usa formato simple o HTML básico</span>
+                  <span id="content-counter" class="text-xs text-neutral-400">0 caracteres</span>
+                </div>
+              </div>
+
+              <!-- Imagen Destacada -->
+              <div class="mb-10">
+                <label class="block text-sm font-semibold text-neutral-900 mb-3">
+                  <span class="flex items-center">
+                    Imagen destacada
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">URL de la imagen principal de la noticia</span>
+                </label>
+                <div class="flex flex-col sm:flex-row gap-4">
+                  <input
+                    type="url"
+                    name="image_url"
+                    placeholder="https://ejemplo.com/imagen.jpg"
+                    class="flex-1 rounded-xl border-2 border-neutral-300 px-5 py-3.5
+                           focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                           transition-all duration-300 hover:border-neutral-400"
+                  />
+                  <button
+                    type="button"
+                    id="upload-image-btn"
+                    class="inline-flex items-center px-6 py-3.5 bg-gradient-to-r from-neutral-100 to-neutral-200 text-neutral-700 font-medium rounded-xl hover:from-white hover:to-neutral-300 transition-all duration-300 shadow-sm hover:shadow border border-neutral-300 whitespace-nowrap"
+                  >
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    Subir Imagen
+                  </button>
+                </div>
+                <div class="mt-4 rounded-xl border-2 border-dashed border-neutral-300 p-6 text-center hidden" id="image-preview-container">
+                  <div id="image-preview" class="max-w-md mx-auto"></div>
+                  <p class="text-sm text-neutral-500 mt-3">Vista previa de la imagen</p>
+                </div>
+                <p class="text-xs text-neutral-400 mt-2">
+                  Recomendado: Imagen en formato JPG o PNG, relación 16:9, mínimo 1200px de ancho.
+                </p>
+              </div>
+
+              <!-- Controles de Publicación -->
+              <div class="pt-8 border-t border-neutral-200">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                      <div class="relative">
+                        <input
+                          type="checkbox"
+                          name="published"
+                          id="published-toggle"
+                          class="sr-only peer"
+                        />
+                        <label
+                          for="published-toggle"
+                          class="relative w-14 h-7 bg-neutral-300 peer-checked:bg-gradient-to-r peer-checked:from-blue-600 peer-checked:to-indigo-600 rounded-full cursor-pointer transition-colors duration-300"
+                        >
+                          <span class="absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform duration-300 peer-checked:translate-x-7"></span>
+                        </label>
+                      </div>
+                      <label for="published-toggle" class="ml-3 text-sm font-medium text-neutral-900 cursor-pointer">
+                        Publicar noticia
+                      </label>
+                    </div>
+                    
+                    <div class="hidden sm:flex items-center space-x-2 text-sm text-neutral-500">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span id="publish-time"></span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <button
+                      type="button"
+                      id="save-draft-btn"
+                      class="inline-flex items-center px-6 py-3.5 bg-gradient-to-r from-neutral-100 to-neutral-200 text-neutral-700 font-medium rounded-xl hover:from-white hover:to-neutral-300 transition-all duration-300 shadow-sm hover:shadow border border-neutral-300"
+                    >
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+                      </svg>
+                      Guardar Borrador
+                    </button>
+                    
+                    <button
+                      type="submit"
+                      id="submit-btn"
+                      class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-105"
+                    >
+                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Publicar Cambios
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mensajes de Estado -->
+              <div id="form-messages" class="mt-6 space-y-3"></div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="space-y-8">
+          <!-- Información de la Noticia -->
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-xl shadow-neutral-200/30 overflow-hidden">
+            <div class="px-6 py-5 border-b border-neutral-200 bg-gradient-to-r from-white to-neutral-50">
+              <h4 class="text-lg font-bold text-neutral-900">Información</h4>
+            </div>
+            <div class="p-6">
+              <div class="space-y-5">
+                <div>
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">ID de la Noticia</div>
+                  <div class="flex items-center">
+                    <div class="font-mono text-lg font-bold text-neutral-900" id="news-id"></div>
+                    <button
+                      id="copy-id-btn"
+                      class="ml-2 p-1.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors"
+                      title="Copiar ID"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                  <div class="p-3 bg-gradient-to-r from-neutral-50 to-blue-50/30 rounded-xl border border-neutral-200">
+                    <div class="text-xs text-neutral-500">Estado actual</div>
+                    <div id="current-status" class="text-sm font-semibold mt-1"></div>
+                  </div>
+                  <div class="p-3 bg-gradient-to-r from-neutral-50 to-blue-50/30 rounded-xl border border-neutral-200">
+                    <div class="text-xs text-neutral-500">Autor</div>
+                    <div id="author-name" class="text-sm font-semibold mt-1 truncate"></div>
+                  </div>
+                </div>
+                
+                <div>
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Fechas</div>
+                  <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Creada:</span>
+                      <span id="created-date" class="font-medium text-neutral-900"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Actualizada:</span>
+                      <span id="updated-date" class="font-medium text-neutral-900"></span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Publicada:</span>
+                      <span id="published-date" class="font-medium text-neutral-900">--</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 rounded-xl border border-blue-100">
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">URL Pública</div>
+                  <div class="text-sm text-blue-600 truncate" id="public-url"></div>
+                  <button
+                    id="copy-url-btn"
+                    class="mt-2 text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors flex items-center"
+                  >
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                    Copiar enlace
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estadísticas -->
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-xl shadow-neutral-200/30 overflow-hidden">
+            <div class="px-6 py-5 border-b border-neutral-200 bg-gradient-to-r from-white to-neutral-50">
+              <h4 class="text-lg font-bold text-neutral-900">Estadísticas</h4>
+            </div>
+            <div class="p-6">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg">
+                      <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">Vistas totales</div>
+                      <div class="text-xs text-neutral-500">Desde su publicación</div>
+                    </div>
+                  </div>
+                  <div class="text-2xl font-bold text-blue-600" id="total-views">0</div>
+                </div>
+                
+                <div class="pt-4 border-t border-neutral-100">
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Actividad Reciente</div>
+                  <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Última vista:</span>
+                      <span id="last-view" class="font-medium text-neutral-900">--</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Visitas hoy:</span>
+                      <span id="views-today" class="font-medium text-emerald-600">0</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Visitas mes:</span>
+                      <span id="views-month" class="font-medium text-blue-600">0</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones Rápidas -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-200/80 shadow-xl shadow-blue-200/30 p-6">
+            <h4 class="text-lg font-bold text-blue-900 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+              Acciones
+            </h4>
+            <div class="space-y-3">
+              <button
+                id="duplicate-btn"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-blue-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-blue-700">Duplicar Noticia</div>
+                    <div class="text-xs text-neutral-500">Crear copia como borrador</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+              
+              <button
+                id="history-btn"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-blue-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-amber-100 to-yellow-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-amber-700">Ver Historial</div>
+                    <div class="text-xs text-neutral-500">Revisiones anteriores</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-amber-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+              
+              <button
+                id="delete-btn"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-red-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-red-100 to-pink-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-red-700">Eliminar Noticia</div>
+                    <div class="text-xs text-neutral-500">Eliminar permanentemente</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-red-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <div id="delete-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Fondo -->
+      <div class="fixed inset-0 transition-opacity bg-neutral-900/70 backdrop-blur-sm"></div>
+
+      <!-- Modal -->
+      <div class="inline-block align-bottom bg-white rounded-2xl shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full overflow-hidden">
+        <div class="p-8">
+          <div class="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-red-100 to-pink-100 rounded-2xl mb-6">
+            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.856-.833-2.624 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+            </svg>
+          </div>
+          
+          <div class="text-center">
+            <h3 class="text-2xl font-bold text-neutral-900 mb-3">Confirmar Eliminación</h3>
+            <p class="text-neutral-600 mb-6">
+              ¿Estás seguro de que deseas eliminar esta noticia?
+              <br>
+              <span class="font-semibold text-neutral-900" id="modal-news-title"></span>
+            </p>
+            <p class="text-sm text-neutral-500 bg-neutral-50 p-4 rounded-xl border border-neutral-200">
+              <svg class="w-4 h-4 inline mr-1 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M9 21a9 9 0 1118 0 9 9 0 01-18 0z"/>
+              </svg>
+              Esta acción no se puede deshacer. La noticia y todas sus estadísticas serán eliminadas permanentemente.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+            <button
+              id="modal-cancel"
+              type="button"
+              class="flex-1 px-6 py-3.5 border-2 border-neutral-300 text-neutral-700 font-semibold rounded-xl hover:bg-neutral-50 transition-all duration-300 hover:border-neutral-400"
+            >
+              Cancelar
+            </button>
+            <button
+              id="modal-confirm"
+              type="button"
+              class="flex-1 px-6 py-3.5 bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/40"
+            >
+              <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Eliminar Noticia
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "../../../../../lib/supabaseClient";
+
+    // Estado global
+    let newsId = null;
+    let originalNews = null;
+    let hasUnsavedChanges = false;
+    let autoSaveInterval = null;
+    let lastSaveTime = null;
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Verificar sesión
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+          window.location.href = "/admin?error=session_expired";
+          return;
+        }
+
+        const user = sessionData.session.user;
+
+        // Verificar permisos
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role, club_id, full_name, avatar_url")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError || !profile || !["admin", "cronica", "editor"].includes(profile.role)) {
+          showNotification('error', 'No tienes permisos para editar noticias');
+          setTimeout(() => window.location.href = "/admin/dashboard", 2000);
+          return;
+        }
+
+        // Obtener ID de la noticia
+        newsId = window.location.pathname.split("/").pop();
+        if (!newsId || isNaN(newsId)) {
+          showNotification('error', 'ID de noticia inválido');
+          setTimeout(() => window.location.href = "/admin/noticias", 2000);
+          return;
+        }
+
+        // Cargar noticia
+        await loadNews(profile, user);
+
+        // Configurar formulario
+        setupForm(profile);
+
+        // Configurar acciones
+        setupActions(profile);
+
+        // Configurar modal
+        setupModal();
+
+        // Iniciar auto-save
+        startAutoSave(profile);
+
+        // Configurar logout
+        document.getElementById('logout').addEventListener('click', async () => {
+          if (hasUnsavedChanges) {
+            const confirmExit = confirm('Tienes cambios sin guardar. ¿Estás seguro de querer salir?');
+            if (!confirmExit) return;
+          }
+          await supabase.auth.signOut();
+          window.location.href = "/admin";
+        });
+
+      } catch (error) {
+        console.error('Error de inicialización:', error);
+        showNotification('error', 'Error al cargar el editor');
+      }
+    });
+
+    async function loadNews(profile, user) {
+      try {
+        // Cargar noticia con datos extendidos
+        const { data: news, error: loadError } = await supabase
+          .from("news")
+          .select(`
+            *,
+            profiles:author_id (full_name, avatar_url),
+            news_stats (views, last_viewed)
+          `)
+          .eq("id", newsId)
+          .eq("club_id", profile.club_id)
+          .single();
+
+        if (loadError || !news) {
+          showNotification('error', 'No se ha podido cargar la noticia');
+          setTimeout(() => window.location.href = "/admin/noticias", 2000);
+          return;
+        }
+
+        originalNews = news;
+
+        // Verificar permisos de edición
+        if (news.author_id !== user.id && !profile.role.includes('admin')) {
+          showNotification('error', 'No tienes permisos para editar esta noticia');
+          setTimeout(() => window.location.href = "/admin/noticias", 2000);
+          return;
+        }
+
+        // Rellenar formulario
+        const form = document.getElementById('news-form');
+        form.title.value = news.title || '';
+        form.excerpt.value = news.excerpt || '';
+        form.content.value = news.content || '';
+        form.image_url.value = news.image_url || '';
+        form.published.checked = news.published || false;
+
+        // Actualizar contadores
+        updateCounter('title-counter', form.title.value.length, 120);
+        updateCounter('excerpt-counter', form.excerpt.value.length, 300);
+        updateCounter('content-counter', form.content.value.length);
+
+        // Actualizar panel lateral
+        updateSidePanel(news, profile, user);
+
+        // Actualizar estado
+        updateStatus(news.published);
+
+        // Mostrar vista previa de imagen si existe
+        if (news.image_url) {
+          showImagePreview(news.image_url);
+        }
+
+        // Actualizar tiempo de publicación
+        if (news.published_at) {
+          const publishDate = new Date(news.published_at);
+          document.getElementById('publish-time').textContent = 
+            `Publicada: ${publishDate.toLocaleDateString('es-ES')}`;
+        }
+
+        // Configurar auto-save indicator
+        lastSaveTime = news.updated_at || news.created_at;
+
+      } catch (error) {
+        console.error('Error cargando noticia:', error);
+        showNotification('error', 'Error al cargar los datos de la noticia');
+      }
+    }
+
+    function updateSidePanel(news, profile, user) {
+      // ID de la noticia
+      document.getElementById('news-id').textContent = `#${newsId}`;
+
+      // Estado actual
+      const statusElement = document.getElementById('current-status');
+      if (news.published) {
+        statusElement.innerHTML = `
+          <span class="px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-xs font-semibold rounded-full border border-green-200">
+            Publicada
+          </span>
+        `;
+      } else {
+        statusElement.innerHTML = `
+          <span class="px-3 py-1 bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 text-xs font-semibold rounded-full border border-amber-200">
+            Borrador
+          </span>
+        `;
+      }
+
+      // Autor
+      document.getElementById('author-name').textContent = 
+        news.profiles?.full_name || profile.full_name || user.email;
+
+      // Fechas
+      const createdDate = new Date(news.created_at);
+      const updatedDate = new Date(news.updated_at || news.created_at);
+      
+      document.getElementById('created-date').textContent = 
+        createdDate.toLocaleDateString('es-ES', { 
+          day: 'numeric', 
+          month: 'short', 
+          year: 'numeric' 
+        });
+      
+      document.getElementById('updated-date').textContent = 
+        updatedDate.toLocaleDateString('es-ES', { 
+          day: 'numeric', 
+          month: 'short', 
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+      if (news.published_at) {
+        const publishedDate = new Date(news.published_at);
+        document.getElementById('published-date').textContent = 
+          publishedDate.toLocaleDateString('es-ES', { 
+            day: 'numeric', 
+            month: 'short', 
+            year: 'numeric' 
+          });
+      }
+
+      // URL pública
+      document.getElementById('public-url').textContent = 
+        `${window.location.origin}/noticias/${newsId}`;
+
+      // Estadísticas
+      const stats = news.news_stats?.[0];
+      if (stats) {
+        document.getElementById('total-views').textContent = stats.views || 0;
+        document.getElementById('views-count').textContent = stats.views || 0;
+        
+        if (stats.last_viewed) {
+          const lastView = new Date(stats.last_viewed);
+          document.getElementById('last-view').textContent = 
+            lastView.toLocaleDateString('es-ES', { 
+              day: 'numeric', 
+              month: 'short' 
+            });
+        }
+      }
+
+      // Actualizar última edición
+      const now = new Date();
+      document.getElementById('last-edited').textContent = 
+        now.toLocaleDateString('es-ES', { 
+          day: 'numeric', 
+          month: 'short',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+    }
+
+    function setupForm(profile) {
+      const form = document.getElementById('news-form');
+      const titleInput = form.querySelector('input[name="title"]');
+      const excerptInput = form.querySelector('textarea[name="excerpt"]');
+      const contentInput = form.querySelector('textarea[name="content"]');
+      const imageInput = form.querySelector('input[name="image_url"]');
+      const publishedToggle = form.querySelector('input[name="published"]');
+      const saveDraftBtn = document.getElementById('save-draft-btn');
+      const submitBtn = document.getElementById('submit-btn');
+      const previewBtn = document.getElementById('preview-btn');
+      const uploadImageBtn = document.getElementById('upload-image-btn');
+      const messagesContainer = document.getElementById('form-messages');
+
+      // Contadores de caracteres
+      titleInput.addEventListener('input', (e) => {
+        updateCounter('title-counter', e.target.value.length, 120);
+        checkForChanges();
+      });
+
+      excerptInput.addEventListener('input', (e) => {
+        updateCounter('excerpt-counter', e.target.value.length, 300);
+        checkForChanges();
+      });
+
+      contentInput.addEventListener('input', (e) => {
+        updateCounter('content-counter', e.target.value.length);
+        checkForChanges();
+      });
+
+      // Vista previa de imagen
+      imageInput.addEventListener('input', (e) => {
+        if (e.target.value) {
+          showImagePreview(e.target.value);
+        } else {
+          hideImagePreview();
+        }
+        checkForChanges();
+      });
+
+      // Botón de subir imagen
+      uploadImageBtn.addEventListener('click', () => {
+        showNotification('info', 'Funcionalidad de subida de imágenes en desarrollo');
+        // Aquí se implementaría la subida real a Supabase Storage
+      });
+
+      // Botones de formato
+      document.getElementById('format-bold').addEventListener('click', () => {
+        insertTextAtCursor(contentInput, '**texto en negrita**');
+      });
+
+      document.getElementById('format-italic').addEventListener('click', () => {
+        insertTextAtCursor(contentInput, '*texto en cursiva*');
+      });
+
+      document.getElementById('format-link').addEventListener('click', () => {
+        const url = prompt('Ingresa la URL del enlace:');
+        if (url) {
+          const text = prompt('Ingresa el texto del enlace (opcional):', url);
+          insertTextAtCursor(contentInput, `[${text || url}](${url})`);
+        }
+      });
+
+      // Guardar borrador
+      saveDraftBtn.addEventListener('click', async () => {
+        await saveNews(false, profile);
+      });
+
+      // Vista previa
+      previewBtn.addEventListener('click', () => {
+        const previewUrl = `/noticias/${newsId}?preview=true`;
+        window.open(previewUrl, '_blank');
+      });
+
+      // Envío del formulario
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const shouldPublish = publishedToggle.checked;
+        await saveNews(shouldPublish, profile);
+      });
+
+      // Detectar cambios
+      form.addEventListener('change', checkForChanges);
+    }
+
+    function updateCounter(elementId, length, max = null) {
+      const element = document.getElementById(elementId);
+      if (max) {
+        element.textContent = `${length}/${max}`;
+        element.className = length > max * 0.9 ? 
+          'text-xs text-amber-600' : 
+          'text-xs text-neutral-400';
+      } else {
+        element.textContent = `${length.toLocaleString()} caracteres`;
+      }
+    }
+
+    function showImagePreview(url) {
+      const container = document.getElementById('image-preview-container');
+      const preview = document.getElementById('image-preview');
+      
+      preview.innerHTML = `
+        <div class="relative rounded-xl overflow-hidden border border-neutral-300">
+          <img 
+            src="${url}" 
+            alt="Vista previa" 
+            class="w-full h-48 object-cover"
+            onerror="this.parentElement.innerHTML='<div class=\\'h-48 flex items-center justify-center bg-neutral-100 text-neutral-500\\'>Error cargando imagen</div>'"
+          />
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+            <p class="text-xs text-white truncate">${url}</p>
+          </div>
+        </div>
+      `;
+      
+      container.classList.remove('hidden');
+    }
+
+    function hideImagePreview() {
+      document.getElementById('image-preview-container').classList.add('hidden');
+    }
+
+    function insertTextAtCursor(textarea, text) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selectedText = textarea.value.substring(start, end);
+      
+      const newText = text.replace('texto', selectedText || 'texto');
+      textarea.value = textarea.value.substring(0, start) + 
+                       newText + 
+                       textarea.value.substring(end);
+      
+      // Posicionar cursor después del texto insertado
+      const newCursorPos = start + newText.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.focus();
+      
+      // Disparar evento input
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function checkForChanges() {
+      if (!originalNews) return;
+      
+      const form = document.getElementById('news-form');
+      const currentData = {
+        title: form.title.value,
+        excerpt: form.excerpt.value,
+        content: form.content.value,
+        image_url: form.image_url.value,
+        published: form.published.checked
+      };
+      
+      const originalData = {
+        title: originalNews.title || '',
+        excerpt: originalNews.excerpt || '',
+        content: originalNews.content || '',
+        image_url: originalNews.image_url || '',
+        published: originalNews.published || false
+      };
+      
+      hasUnsavedChanges = JSON.stringify(currentData) !== JSON.stringify(originalData);
+      
+      // Actualizar indicador de estado
+      const statusIndicator = document.getElementById('status-indicator');
+      const statusText = document.getElementById('status-text');
+      
+      if (hasUnsavedChanges) {
+        statusIndicator.className = 'h-2 w-2 rounded-full bg-amber-500 animate-pulse';
+        statusText.textContent = 'Cambios sin guardar';
+        statusText.className = 'text-sm font-medium text-amber-600';
+      } else {
+        statusIndicator.className = 'h-2 w-2 rounded-full bg-green-500 animate-pulse';
+        statusText.textContent = 'Guardado';
+        statusText.className = 'text-sm font-medium text-green-600';
+      }
+    }
+
+    function updateStatus(isPublished) {
+      const statusIndicator = document.getElementById('status-indicator');
+      const statusText = document.getElementById('status-text');
+      
+      if (isPublished) {
+        statusIndicator.className = 'h-2 w-2 rounded-full bg-green-500 animate-pulse';
+        statusText.textContent = 'Publicada';
+        statusText.className = 'text-sm font-medium text-green-600';
+      } else {
+        statusIndicator.className = 'h-2 w-2 rounded-full bg-amber-500 animate-pulse';
+        statusText.textContent = 'Borrador';
+        statusText.className = 'text-sm font-medium text-amber-600';
+      }
+    }
+
+    async function saveNews(shouldPublish, profile) {
+      const form = document.getElementById('news-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const messagesContainer = document.getElementById('form-messages');
+      
+      // Limpiar mensajes anteriores
+      messagesContainer.innerHTML = '';
+      
+      // Validación básica
+      if (!form.title.value.trim()) {
+        showFormMessage('error', 'El título es obligatorio');
+        form.title.focus();
+        return;
+      }
+      
+      if (!form.content.value.trim()) {
+        showFormMessage('error', 'El contenido es obligatorio');
+        form.content.focus();
+        return;
+      }
+      
+      // Preparar datos
+      const payload = {
+        title: form.title.value.trim(),
+        excerpt: form.excerpt.value.trim(),
+        content: form.content.value.trim(),
+        image_url: form.image_url.value.trim() || null,
+        published: shouldPublish,
+        updated_at: new Date().toISOString()
+      };
+      
+      if (shouldPublish && !originalNews.published) {
+        payload.published_at = new Date().toISOString();
+      }
+      
+      // Deshabilitar botón y mostrar estado
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+        ${shouldPublish ? 'Publicando...' : 'Guardando...'}
+      `;
+      
+      try {
+        // Actualizar en Supabase
+        const { error } = await supabase
+          .from("news")
+          .update(payload)
+          .eq("id", newsId);
+        
+        if (error) throw error;
+        
+        // Actualizar estado local
+        originalNews = { ...originalNews, ...payload };
+        hasUnsavedChanges = false;
+        lastSaveTime = new Date().toISOString();
+        
+        // Mostrar mensaje de éxito
+        if (shouldPublish) {
+          showFormMessage('success', 'Noticia publicada exitosamente');
+          showNotification('success', '¡Noticia publicada!');
+          updateStatus(true);
+        } else {
+          showFormMessage('success', 'Cambios guardados correctamente');
+          updateStatus(false);
+        }
+        
+        // Actualizar indicador de auto-save
+        updateAutoSaveIndicator();
+        
+        // Redirigir después de publicar
+        if (shouldPublish) {
+          setTimeout(() => {
+            window.location.href = "/admin/noticias";
+          }, 1500);
+        }
+        
+      } catch (error) {
+        console.error('Error guardando noticia:', error);
+        showFormMessage('error', `Error al guardar: ${error.message}`);
+        showNotification('error', 'Error al guardar los cambios');
+      } finally {
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
+    }
+
+    function startAutoSave(profile) {
+      // Guardar automáticamente cada 60 segundos si hay cambios
+      autoSaveInterval = setInterval(async () => {
+        if (hasUnsavedChanges && !document.getElementById('submit-btn').disabled) {
+          try {
+            const form = document.getElementById('news-form');
+            const payload = {
+              title: form.title.value.trim(),
+              excerpt: form.excerpt.value.trim(),
+              content: form.content.value.trim(),
+              image_url: form.image_url.value.trim() || null,
+              updated_at: new Date().toISOString()
+            };
+            
+            await supabase
+              .from("news")
+              .update(payload)
+              .eq("id", newsId);
+            
+            lastSaveTime = new Date().toISOString();
+            updateAutoSaveIndicator();
+            
+          } catch (error) {
+            console.error('Error en auto-save:', error);
+          }
+        }
+      }, 60000); // 60 segundos
+      
+      // Limpiar al salir
+      window.addEventListener('beforeunload', () => {
+        clearInterval(autoSaveInterval);
+      });
+    }
+
+    function updateAutoSaveIndicator() {
+      const indicator = document.getElementById('auto-save-indicator');
+      indicator.innerHTML = `
+        <span class="flex items-center">
+          <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          Guardado
+        </span>
+      `;
+      
+      // Animación temporal
+      indicator.classList.add('animate-pulse');
+      setTimeout(() => {
+        indicator.classList.remove('animate-pulse');
+      }, 1000);
+    }
+
+    function setupActions(profile) {
+      const duplicateBtn = document.getElementById('duplicate-btn');
+      const historyBtn = document.getElementById('history-btn');
+      const deleteBtn = document.getElementById('delete-btn');
+      const copyIdBtn = document.getElementById('copy-id-btn');
+      const copyUrlBtn = document.getElementById('copy-url-btn');
+      
+      // Duplicar noticia
+      duplicateBtn.addEventListener('click', async () => {
+        if (confirm('¿Duplicar esta noticia como nuevo borrador?')) {
+          try {
+            const { data, error } = await supabase
+              .from("news")
+              .insert({
+                club_id: profile.club_id,
+                title: originalNews.title + ' (Copia)',
+                excerpt: originalNews.excerpt,
+                content: originalNews.content,
+                image_url: originalNews.image_url,
+                published: false,
+                author_id: (await supabase.auth.getSession()).data.session.user.id
+              })
+              .select()
+              .single();
+            
+            if (error) throw error;
+            
+            showNotification('success', 'Noticia duplicada exitosamente');
+            setTimeout(() => {
+              window.location.href = `/admin/noticias/editar/${data.id}`;
+            }, 1000);
+            
+          } catch (error) {
+            console.error('Error duplicando noticia:', error);
+            showNotification('error', 'Error al duplicar la noticia');
+          }
+        }
+      });
+      
+      // Historial (placeholder)
+      historyBtn.addEventListener('click', () => {
+        showNotification('info', 'Funcionalidad de historial en desarrollo');
+      });
+      
+      // Eliminar noticia
+      deleteBtn.addEventListener('click', () => {
+        document.getElementById('modal-news-title').textContent = originalNews.title;
+        document.getElementById('delete-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+      
+      // Copiar ID
+      copyIdBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(newsId);
+        showNotification('success', 'ID copiado al portapapeles');
+      });
+      
+      // Copiar URL
+      copyUrlBtn.addEventListener('click', () => {
+        const url = `${window.location.origin}/noticias/${newsId}`;
+        navigator.clipboard.writeText(url);
+        showNotification('success', 'URL copiada al portapapeles');
+      });
+    }
+
+    function setupModal() {
+      const modal = document.getElementById('delete-modal');
+      const cancelBtn = document.getElementById('modal-cancel');
+      const confirmBtn = document.getElementById('modal-confirm');
+      
+      cancelBtn.addEventListener('click', hideDeleteModal);
+      
+      confirmBtn.addEventListener('click', async () => {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = `
+          <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+          Eliminando...
+        `;
+        
+        try {
+          const { error } = await supabase
+            .from("news")
+            .delete()
+            .eq("id", newsId);
+          
+          if (error) throw error;
+          
+          hideDeleteModal();
+          showNotification('success', 'Noticia eliminada exitosamente');
+          
+          setTimeout(() => {
+            window.location.href = "/admin/noticias";
+          }, 1000);
+          
+        } catch (error) {
+          console.error('Error eliminando noticia:', error);
+          showNotification('error', 'Error al eliminar la noticia');
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = `
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+            Eliminar Noticia
+          `;
+        }
+      });
+      
+      // Cerrar modal al hacer clic fuera
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          hideDeleteModal();
+        }
+      });
+      
+      // Cerrar con Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+          hideDeleteModal();
+        }
+      });
+    }
+
+    function hideDeleteModal() {
+      document.getElementById('delete-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      document.getElementById('modal-confirm').disabled = false;
+      document.getElementById('modal-confirm').innerHTML = `
+        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+        Eliminar Noticia
+      `;
+    }
+
+    function showFormMessage(type, text) {
+      const messagesContainer = document.getElementById('form-messages');
+      const messageDiv = document.createElement('div');
+      
+      const colors = {
+        success: { bg: 'bg-gradient-to-r from-green-50 to-emerald-50', border: 'border-green-200', text: 'text-green-800' },
+        error: { bg: 'bg-gradient-to-r from-red-50 to-pink-50', border: 'border-red-200', text: 'text-red-800' }
+      };
+      
+      messageDiv.className = `p-4 rounded-xl border ${colors[type].bg} ${colors[type].border} ${colors[type].text}`;
+      messageDiv.innerHTML = `
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            ${
+              type === 'success' 
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M9 21a9 9 0 1118 0 9 9 0 01-18 0z"/>'
+            }
+          </svg>
+          <span class="font-medium">${text}</span>
+        </div>
+      `;
+      
+      messagesContainer.appendChild(messageDiv);
+      
+      if (type === 'success') {
+        setTimeout(() => messageDiv.remove(), 5000);
+      }
+    }
+
+    function showNotification(type, message, duration = 5000) {
+      const notification = document.createElement('div');
+      const colors = {
+        success: { bg: 'from-green-500 to-emerald-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+        error: { bg: 'from-red-500 to-pink-500', icon: 'M12 9v2m0 4h.01M9 21a9 9 0 1118 0 9 9 0 01-18 0z' },
+        info: { bg: 'from-blue-500 to-indigo-500', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+        warning: { bg: 'from-amber-500 to-yellow-500', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.856-.833-2.624 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5' }
+      };
+      
+      notification.className = `fixed top-6 right-6 z-50 max-w-md transform transition-all duration-500 translate-x-full`;
+      notification.innerHTML = `
+        <div class="bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden">
+          <div class="flex items-start p-4">
+            <div class="flex-shrink-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r ${colors[type].bg} flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${colors[type].icon}"/>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p class="text-sm font-medium text-neutral-900">${message}</p>
+            </div>
+            <button class="ml-4 flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors" onclick="this.parentElement.parentElement.parentElement.remove()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="h-1 w-full bg-gradient-to-r ${colors[type].bg}"></div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Animar entrada
+      requestAnimationFrame(() => {
+        notification.classList.remove('translate-x-full');
+      });
+      
+      // Auto-eliminar
+      setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => notification.remove(), 500);
+      }, duration);
+    }
+  </script>
+</BaseLayout>

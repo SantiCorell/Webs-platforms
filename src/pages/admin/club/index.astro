@@ -1,0 +1,967 @@
+---
+export const prerender = false;
+
+
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { getSupabaseServer } from "../../../lib/supabaseServer";
+
+const supabase = getSupabaseServer(Astro.cookies);
+
+// 1️⃣ sesión
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+if (!session) {
+  return Astro.redirect("/admin/login");
+}
+
+const user = session.user;
+
+// 2️⃣ permisos
+const { data: profile } = await supabase
+  .from("profiles")
+  .select("role, club_id")
+  .eq("id", user.id)
+  .single();
+
+if (!profile || profile.role !== "admin") {
+  return Astro.redirect("/admin");
+}
+
+// 3️⃣ datos del club
+const { data: clubData } = await supabase
+  .from("clubs")
+  .select("*")
+  .eq("id", profile.club_id)
+  .single();
+
+// 4️⃣ datos seguros para cliente
+const clientData = {
+  clubId: clubData.id,
+  name: clubData.name,
+  slug: clubData.slug,
+  description: clubData.description,
+  defaultColor: clubData.default_color,
+  email: clubData.email,
+  phone: clubData.phone,
+  address: clubData.address,
+  domain: clubData.domain,
+  president_name: clubData.president_name,
+  logo_url: clubData.logo_url,
+  facebook: clubData.facebook,
+  instagram: clubData.instagram,
+  twitter: clubData.twitter,
+  youtube: clubData.youtube,
+  founded_year: clubData.founded_year,
+  tax_id: clubData.tax_id,
+  office_hours: clubData.office_hours,
+};
+---
+
+<script type="application/json" id="client-data">
+  {JSON.stringify(clientData)}
+</script>
+
+
+<BaseLayout title="Datos Institucionales · Administración">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-orange-50/30">
+
+    <!-- HEADER -->
+    <header class="bg-white/95 backdrop-blur border-b border-neutral-200 sticky top-0 z-40">
+      <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <a href="/admin/dashboard"
+             class="p-2 rounded-xl hover:bg-neutral-100 transition"
+             title="Volver al panel">
+            ←
+          </a>
+          <div>
+            <h1 class="font-semibold text-neutral-900">Datos Institucionales</h1>
+            <p class="text-xs text-neutral-500">
+              Identidad oficial y configuración del club
+            </p>
+          </div>
+        </div>
+
+        <button
+          id="logout"
+          class="px-4 py-2 text-sm rounded-xl hover:bg-red-50 hover:text-red-700 transition">
+          Cerrar sesión
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="max-w-6xl mx-auto px-6 py-10">
+
+      <!-- INTRO -->
+      <div class="mb-12">
+        <h2 class="text-3xl font-bold text-neutral-900 mb-3">
+          Configuración del Club
+        </h2>
+        <p class="text-neutral-600 max-w-3xl">
+          Esta información se utiliza en la web pública, documentos oficiales,
+          patrocinadores y comunicaciones del club.
+        </p>
+      </div>
+
+      <!-- NOTIFICACIONES -->
+      <div id="notification" class="hidden fixed top-6 right-6 z-50 max-w-md transform transition-all duration-500 translate-x-full">
+        <div class="bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden">
+          <div class="flex items-start p-4">
+            <div class="flex-shrink-0">
+              <div id="notification-icon" class="w-10 h-10 rounded-full bg-gradient-to-r from-emerald-500 to-green-500 flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p id="notification-message" class="text-sm font-medium text-neutral-900"></p>
+            </div>
+            <button class="ml-4 flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors" onclick="this.parentElement.parentElement.parentElement.remove()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div id="notification-progress" class="h-1 w-full bg-gradient-to-r from-emerald-500 to-green-500"></div>
+        </div>
+      </div>
+
+      <form id="club-form" class="space-y-14">
+
+        <!-- IDENTIDAD -->
+        <section class="card">
+          <header class="card-header">
+            <h3>Identidad visual</h3>
+            <p>Nombre, marca y apariencia del club</p>
+          </header>
+
+          <div class="card-body grid md:grid-cols-2 gap-8">
+
+            <div>
+              <label>Nombre del club *</label>
+              <input name="name" id="club-name" required value={clientData.name} />
+              <p class="hint">Nombre completo y legal de la institución</p>
+            </div>
+
+            <div>
+              <label>Slug</label>
+              <div class="flex gap-2">
+                <input id="club-slug" value={clientData.slug} readonly class="readonly flex-1" />
+                <button type="button" id="copy-slug" class="px-3 rounded-lg border border-neutral-300 hover:bg-neutral-50">
+                  <svg class="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                  </svg>
+                </button>
+              </div>
+              <p class="hint">Se genera automáticamente</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <label>Descripción institucional</label>
+              <textarea name="description" id="club-description" rows="3">{clientData.description}</textarea>
+              <p class="hint">Breve descripción para SEO y presentación</p>
+            </div>
+
+            <!-- COLOR -->
+            <div>
+              <label>Color corporativo</label>
+              <div class="flex items-center gap-4">
+                <input type="color" name="color" id="club-color" class="color-input" value={clientData.defaultColor} />
+                <div class="flex-1">
+                  <p class="text-xs text-neutral-500 mb-1">Vista previa</p>
+                  <div class="flex gap-2">
+                    <div id="color-preview-primary" class="h-10 flex-1 rounded-xl border border-neutral-300" style={`background-color: ${clientData.defaultColor}`}></div>
+                    <div id="color-preview-light" class="h-10 flex-1 rounded-xl border border-neutral-300" style={`background-color: ${clientData.defaultColor}20`}></div>
+                    <div id="color-preview-dark" class="h-10 flex-1 rounded-xl border border-neutral-300" style={`background-color: ${clientData.defaultColor}d9`}></div>
+                  </div>
+                </div>
+              </div>
+              <p class="hint">Color principal de la marca</p>
+            </div>
+
+            <!-- LOGO -->
+            <div>
+              <label>Logo del club</label>
+              <div class="space-y-4">
+                <div>
+                  <input name="logo_url" id="club-logo-url" placeholder="https://..." value={clientData.logo_url} />
+                  <p class="hint">URL completa del logo</p>
+                </div>
+                
+                <div class="flex gap-3">
+                  <button type="button" id="upload-logo-btn" class="px-4 py-2.5 flex-1 rounded-xl border border-neutral-300 hover:bg-neutral-50 transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                    </svg>
+                    Subir logo
+                  </button>
+                  <button type="button" id="clear-logo-btn" class="px-4 py-2.5 flex-1 rounded-xl border border-neutral-300 hover:bg-neutral-50 transition flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                    Eliminar
+                  </button>
+                </div>
+                
+                <div id="logo-preview-container" class={`${clientData.logo_url ? '' : 'hidden'}`}>
+                  <div class="p-4 border border-neutral-300 rounded-xl bg-neutral-50/50">
+                    <p class="text-xs font-semibold text-neutral-500 uppercase mb-3">Vista previa</p>
+                    <div class="flex items-center gap-6">
+                      <div id="logo-preview" class="w-32 h-32 rounded-xl border border-neutral-300 bg-white p-4 flex items-center justify-center">
+                        {clientData.logo_url ? (
+                          <img 
+                            id="logo-img"
+                            src={clientData.logo_url} 
+                            alt="Logo del club" 
+                            class="max-w-full max-h-full object-contain"
+                          />
+                        ) : (
+                          <div class="text-neutral-400 text-center">
+                            <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <p class="text-xs">Sin logo</p>
+                          </div>
+                        )}
+                      </div>
+                      <div class="flex-1">
+                        <p class="text-sm text-neutral-600 mb-2">
+                          El logo se mostrará en:
+                        </p>
+                        <ul class="text-xs text-neutral-500 space-y-1">
+                          <li class="flex items-center gap-2">
+                            <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Encabezado del sitio web
+                          </li>
+                          <li class="flex items-center gap-2">
+                            <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Tarjetas de noticias
+                          </li>
+                          <li class="flex items-center gap-2">
+                            <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Documentos oficiales
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- CONTACTO -->
+        <section class="card">
+          <header class="card-header">
+            <h3>Datos de contacto</h3>
+            <p>Información oficial de comunicación</p>
+          </header>
+
+          <div class="card-body grid md:grid-cols-2 gap-8">
+            <div>
+              <label>Email oficial *</label>
+              <input type="email" name="email" id="club-email" required value={clientData.email} />
+              <p class="hint">Dirección de contacto principal</p>
+            </div>
+
+            <div>
+              <label>Teléfono</label>
+              <input name="phone" id="club-phone" value={clientData.phone} />
+              <p class="hint">Número principal del club</p>
+            </div>
+
+            <div class="md:col-span-2">
+              <label>Dirección</label>
+              <input name="address" id="club-address" value={clientData.address} />
+              <p class="hint">Ubicación oficial del club</p>
+            </div>
+
+            <div>
+              <label>Dominio web</label>
+              <div class="flex">
+                <span class="px-3 bg-neutral-100 border border-r-0 border-neutral-300 rounded-l-lg flex items-center text-neutral-600">
+                  https://
+                </span>
+                <input name="domain" id="club-domain" class="rounded-l-none" value={clientData.domain} />
+              </div>
+              <p class="hint">Sin "https://" ni "/" al final</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- REDES SOCIALES -->
+        <section class="card">
+          <header class="card-header">
+            <h3>Redes sociales</h3>
+            <p>Perfiles oficiales en redes</p>
+          </header>
+
+          <div class="card-body grid md:grid-cols-2 gap-8">
+            <div>
+              <label class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Facebook
+              </label>
+              <input name="facebook" id="club-facebook" value={clientData.facebook} placeholder="https://facebook.com/tuclub" />
+            </div>
+
+            <div>
+              <label class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-pink-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM5.838 12a6.162 6.162 0 1112.324 0 6.162 6.162 0 01-12.324 0zM12 16a4 4 0 110-8 4 4 0 010 8zm4.965-10.405a1.44 1.44 0 112.881.001 1.44 1.44 0 01-2.881-.001z"/>
+                </svg>
+                Instagram
+              </label>
+              <input name="instagram" id="club-instagram" value={clientData.instagram} placeholder="https://instagram.com/tuclub" />
+            </div>
+
+            <div>
+              <label class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                </svg>
+                Twitter
+              </label>
+              <input name="twitter" id="club-twitter" value={clientData.twitter} placeholder="https://twitter.com/tuclub" />
+            </div>
+
+            <div>
+              <label class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+                </svg>
+                YouTube
+              </label>
+              <input name="youtube" id="club-youtube" value={clientData.youtube} placeholder="https://youtube.com/tuclub" />
+            </div>
+          </div>
+        </section>
+
+        <!-- REPRESENTACIÓN -->
+        <section class="card">
+          <header class="card-header">
+            <h3>Representación institucional</h3>
+            <p>Datos legales y representativos</p>
+          </header>
+
+          <div class="card-body grid md:grid-cols-2 gap-8">
+            <div>
+              <label>Nombre del presidente</label>
+              <input name="president_name" id="club-president" value={clientData.president_name} />
+              <p class="hint">Nombre del representante legal</p>
+            </div>
+
+            <div>
+              <label>Fecha de fundación</label>
+              <input type="number" name="founded_year" id="club-founded" min="1800" max={new Date().getFullYear()} value={clientData.founded_year} />
+              <p class="hint">Año de creación del club</p>
+            </div>
+
+            <div>
+              <label>CIF / NIF</label>
+              <input name="tax_id" id="club-tax-id" value={clientData.tax_id} />
+              <p class="hint">Identificador fiscal del club</p>
+            </div>
+
+            <div>
+              <label>Horario de atención</label>
+              <input name="office_hours" id="club-office-hours" value={clientData.office_hours} placeholder="Lunes a Viernes: 9:00 - 18:00" />
+              <p class="hint">Horas de atención al público</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACTIONS -->
+        <div class="flex justify-end items-center gap-4">
+          <span id="status"
+                class="text-sm text-neutral-500 min-h-[1.2rem]"></span>
+
+          <button type="submit" id="submit-btn" class="primary-btn">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            Guardar cambios
+          </button>
+        </div>
+
+      </form>
+    </main>
+  </div>
+
+  <!-- MODAL SUBIR LOGO -->
+  <div id="upload-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center">
+      <div class="fixed inset-0 bg-neutral-900/70 backdrop-blur-sm"></div>
+      
+      <div class="inline-block bg-white rounded-2xl shadow-2xl transform transition-all max-w-md w-full overflow-hidden text-left">
+        <div class="p-8">
+          <div class="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl mb-6">
+            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          
+          <h3 class="text-2xl font-bold text-neutral-900 mb-3 text-center">Subir logo</h3>
+          <p class="text-neutral-600 mb-6 text-center">
+            Selecciona una imagen para el logo del club.
+          </p>
+          
+          <div class="mb-6">
+            <div id="drop-zone" class="border-2 border-dashed border-neutral-300 rounded-2xl p-8 text-center hover:border-orange-500 hover:bg-orange-50/50 transition-all cursor-pointer">
+              <svg class="w-12 h-12 text-neutral-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <p class="text-neutral-900 font-medium mb-2">Arrastra y suelta tu archivo</p>
+              <p class="text-neutral-500 text-sm">o haz clic para seleccionar</p>
+              <p class="text-xs text-neutral-400 mt-2">PNG, JPG, SVG, WebP • Máx. 2MB</p>
+            </div>
+            <input type="file" id="logo-file" accept=".png,.jpg,.jpeg,.svg,.webp" class="hidden" />
+          </div>
+          
+          <div id="selected-preview" class="hidden mb-6">
+            <p class="text-sm font-medium text-neutral-900 mb-3 text-center">Vista previa:</p>
+            <div class="w-32 h-32 mx-auto rounded-xl border border-neutral-300 bg-white p-4">
+              <img id="preview-img" class="w-full h-full object-contain" />
+            </div>
+            <p id="file-info" class="text-xs text-neutral-500 text-center mt-2"></p>
+          </div>
+          
+          <div id="upload-messages" class="mb-6 space-y-2"></div>
+          
+          <div class="flex gap-4">
+            <button type="button" id="cancel-upload" class="flex-1 px-6 py-3.5 border-2 border-neutral-300 text-neutral-700 font-semibold rounded-xl hover:bg-neutral-50 transition">
+              Cancelar
+            </button>
+            <button type="button" id="confirm-upload" class="flex-1 px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-lg shadow-blue-500/25 flex items-center justify-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+              </svg>
+              Subir
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "@/lib/supabaseClient";
+
+    const clientData = JSON.parse(
+      document.getElementById('client-data').textContent
+    );
+
+    
+    // Estado
+    let selectedLogoFile = null;
+    let isUploading = false;
+    
+    // Elementos
+    const form = document.getElementById('club-form');
+    const status = document.getElementById('status');
+    const submitBtn = document.getElementById('submit-btn');
+    
+    // Inicializar
+    document.addEventListener('DOMContentLoaded', () => {
+      setupColorPreview();
+      setupSlug();
+      setupLogo();
+      setupForm();
+      setupLogout();
+    });
+    
+    // Vista previa de color
+    function setupColorPreview() {
+      const colorInput = document.getElementById('club-color');
+      const updatePreview = (color) => {
+        document.getElementById('color-preview-primary').style.backgroundColor = color;
+        document.getElementById('color-preview-light').style.backgroundColor = color + '20';
+        document.getElementById('color-preview-dark').style.backgroundColor = color + 'd9';
+      };
+      
+      colorInput.addEventListener('input', (e) => updatePreview(e.target.value));
+      updatePreview(clientData.defaultColor);
+    }
+    
+    // Slug
+    function setupSlug() {
+      const nameInput = document.getElementById('club-name');
+      const slugInput = document.getElementById('club-slug');
+      const copyBtn = document.getElementById('copy-slug');
+      
+      nameInput.addEventListener('input', (e) => {
+        const slug = e.target.value.toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '');
+        slugInput.value = slug;
+      });
+      
+      copyBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText(slugInput.value);
+        showNotification('success', 'Slug copiado al portapapeles');
+      });
+    }
+    
+    // Logo
+    function setupLogo() {
+      const uploadBtn = document.getElementById('upload-logo-btn');
+      const clearBtn = document.getElementById('clear-logo-btn');
+      const logoUrlInput = document.getElementById('club-logo-url');
+      
+      uploadBtn.addEventListener('click', openUploadModal);
+      clearBtn.addEventListener('click', () => {
+        logoUrlInput.value = '';
+        updateLogoPreview('');
+        showNotification('info', 'Logo eliminado');
+      });
+      
+      logoUrlInput.addEventListener('input', (e) => {
+        updateLogoPreview(e.target.value);
+      });
+    }
+    
+    // Modal de subida
+    function openUploadModal() {
+      const modal = document.getElementById('upload-modal');
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('logo-file');
+      const preview = document.getElementById('selected-preview');
+      const messages = document.getElementById('upload-messages');
+      
+      // Reset
+      preview.classList.add('hidden');
+      messages.innerHTML = '';
+      selectedLogoFile = null;
+      fileInput.value = '';
+      
+      // Mostrar
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // Eventos
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-orange-500', 'bg-orange-50/50');
+      });
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-orange-500', 'bg-orange-50/50');
+      });
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-orange-500', 'bg-orange-50/50');
+        handleFileSelection(e.dataTransfer.files[0]);
+      });
+      
+      fileInput.addEventListener('change', (e) => {
+        handleFileSelection(e.target.files[0]);
+      });
+      
+      document.getElementById('cancel-upload').addEventListener('click', () => {
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      });
+      
+      document.getElementById('confirm-upload').addEventListener('click', uploadLogo);
+      
+      // Cerrar modal
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+          document.body.style.overflow = 'auto';
+        }
+      });
+      
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          modal.classList.add('hidden');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    }
+    
+    function handleFileSelection(file) {
+      if (!file) return;
+      
+      const validTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        showUploadMessage('error', 'Formato no válido. Usa PNG, JPG, SVG o WebP.');
+        return;
+      }
+      
+      if (file.size > 2 * 1024 * 1024) {
+        showUploadMessage('error', 'La imagen es demasiado grande. Máximo 2MB.');
+        return;
+      }
+      
+      selectedLogoFile = file;
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = document.getElementById('selected-preview');
+        const img = document.getElementById('preview-img');
+        const fileInfo = document.getElementById('file-info');
+        
+        img.src = e.target.result;
+        fileInfo.textContent = `${file.name} • ${(file.size / 1024).toFixed(0)} KB`;
+        preview.classList.remove('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    async function uploadLogo() {
+      if (!selectedLogoFile || isUploading) return;
+      
+      isUploading = true;
+      const btn = document.getElementById('confirm-upload');
+      const originalText = btn.innerHTML;
+      
+      btn.disabled = true;
+      btn.innerHTML = `
+        <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+        Subiendo...
+      `;
+      
+      try {
+        // Aquí iría la lógica de subida a Supabase
+        // Por ahora simulamos una subida exitosa
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // URL de ejemplo (en producción sería la URL de Supabase Storage)
+        const fakeUrl = `https://example.com/logos/${Date.now()}_${selectedLogoFile.name}`;
+        
+        // Actualizar campo
+        document.getElementById('club-logo-url').value = fakeUrl;
+        updateLogoPreview(fakeUrl);
+        
+        // Cerrar modal
+        document.getElementById('upload-modal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        
+        showNotification('success', '¡Logo subido exitosamente!');
+        
+      } catch (error) {
+        console.error('Error subiendo logo:', error);
+        showUploadMessage('error', `Error al subir: ${error.message}`);
+      } finally {
+        isUploading = false;
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      }
+    }
+    
+    function updateLogoPreview(url) {
+      const container = document.getElementById('logo-preview-container');
+      const img = container.querySelector('img');
+      
+      if (url) {
+        if (img) {
+          img.src = url;
+        }
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+    
+    function showUploadMessage(type, text) {
+      const container = document.getElementById('upload-messages');
+      const colors = {
+        success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+        error: 'bg-red-50 border-red-200 text-red-800',
+        info: 'bg-blue-50 border-blue-200 text-blue-800'
+      };
+      
+      container.innerHTML = `
+        <div class="p-3 rounded-xl border ${colors[type]}">
+          <div class="flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              ${
+                type === 'success' 
+                  ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                  : type === 'error'
+                  ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M9 21a9 9 0 1118 0 9 9 0 01-18 0z"/>'
+                  : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+              }
+            </svg>
+            <span class="text-sm">${text}</span>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Formulario
+    function setupForm() {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+          Guardando...
+        `;
+        
+        status.textContent = '';
+        
+        try {
+          const formData = new FormData(form);
+          const data = Object.fromEntries(formData.entries());
+          
+          if (!data.name?.trim()) {
+            throw new Error('El nombre del club es obligatorio');
+          }
+          if (!data.email?.trim()) {
+            throw new Error('El email es obligatorio');
+          }
+          if (data.email && !isValidEmail(data.email)) {
+            throw new Error('El email no es válido');
+          }
+
+          const payload = {
+            name: data.name?.toString().trim(),
+            email: data.email?.toString().trim(),
+            phone: data.phone?.toString().trim() || null,
+            address: data.address?.toString().trim() || null,
+            domain: data.domain?.toString().trim() || null,
+            description: data.description?.toString().trim() || null,
+            default_color: data.color?.toString().trim() || null,
+            logo_url: data.logo_url?.toString().trim() || null,
+            facebook: data.facebook?.toString().trim() || null,
+            instagram: data.instagram?.toString().trim() || null,
+            twitter: data.twitter?.toString().trim() || null,
+            youtube: data.youtube?.toString().trim() || null,
+            president_name: data.president_name?.toString().trim() || null,
+            founded_year: data.founded_year ? Number(data.founded_year) : null,
+            tax_id: data.tax_id?.toString().trim() || null,
+            office_hours: data.office_hours?.toString().trim() || null,
+          };
+
+          const res = await fetch('/api/admin/club/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+
+          const result = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            throw new Error(result.error || 'Error al guardar');
+          }
+          
+          status.textContent = '✅ Cambios guardados correctamente';
+          status.className = 'text-sm text-emerald-600 min-h-[1.2rem]';
+          showNotification('success', 'Configuración guardada exitosamente');
+          
+          setTimeout(() => {
+            status.textContent = '';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+          }, 3000);
+          
+        } catch (error) {
+          console.error('Error guardando:', error);
+          status.textContent = `❌ ${error.message}`;
+          status.className = 'text-sm text-red-600 min-h-[1.2rem]';
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          showNotification('error', error.message);
+        }
+      });
+    }
+    
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    // Logout
+    function setupLogout() {
+      document.getElementById('logout').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.href = '/admin/login';
+      });
+    }
+    
+    // Notificaciones
+    function showNotification(type, message, duration = 5000) {
+      const notification = document.getElementById('notification');
+      const icon = document.getElementById('notification-icon');
+      const messageEl = document.getElementById('notification-message');
+      const progress = document.getElementById('notification-progress');
+      
+      // Configurar colores
+      const colors = {
+        success: { bg: 'from-emerald-500 to-green-500', icon: 'M5 13l4 4L19 7' },
+        error: { bg: 'from-red-500 to-pink-500', icon: 'M12 9v2m0 4h.01M9 21a9 9 0 1118 0 9 9 0 01-18 0z' },
+        info: { bg: 'from-blue-500 to-indigo-500', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' }
+      };
+      
+      icon.className = `w-10 h-10 rounded-full bg-gradient-to-r ${colors[type].bg} flex items-center justify-center`;
+      icon.innerHTML = `
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${colors[type].icon}"/>
+        </svg>
+      `;
+      progress.className = `h-1 w-full bg-gradient-to-r ${colors[type].bg}`;
+      messageEl.textContent = message;
+      
+      // Mostrar
+      notification.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        notification.classList.remove('translate-x-full');
+      });
+      
+      // Auto-ocultar
+      setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => notification.classList.add('hidden'), 500);
+      }, duration);
+    }
+  </script>
+
+  <style>
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #171717;
+      margin-bottom: 0.35rem;
+      display: block;
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: #737373;
+      margin-top: 0.25rem;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid #e5e5e5;
+      background: white;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #fb923c;
+      box-shadow: 0 0 0 3px rgb(251 146 60 / 0.15);
+      background: white;
+    }
+
+    input:hover, textarea:hover {
+      border-color: #d4d4d4;
+    }
+
+    .readonly {
+      background: #f5f5f5;
+      color: #737373;
+      cursor: not-allowed;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e5e5e5;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    }
+
+    .card-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #f5f5f5;
+      background: #fafafa;
+    }
+
+    .card-header h3 {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #171717;
+      margin-bottom: 0.25rem;
+    }
+
+    .card-header p {
+      font-size: 0.85rem;
+      color: #737373;
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .primary-btn {
+      padding: 0.85rem 2rem;
+      border-radius: 0.9rem;
+      background: linear-gradient(to right, #f97316, #f59e0b);
+      color: white;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgb(249 115 22 / 0.25);
+    }
+
+    .primary-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgb(249 115 22 / 0.35);
+    }
+
+    .primary-btn:active {
+      transform: translateY(0);
+    }
+
+    .primary-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .color-input {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-radius: 0.75rem;
+      border: 2px solid #e5e5e5;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .color-input::-webkit-color-swatch-wrapper {
+      padding: 0;
+    }
+
+    .color-input::-webkit-color-swatch {
+      border: none;
+      border-radius: 0.5rem;
+    }
+    
+    /* Animaciones */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+  </style>
+</BaseLayout>

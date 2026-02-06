@@ -1,17 +1,50 @@
 ---
-
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { clubs } from "@/data/clubs";
+const clubList = Object.values(clubs);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BaseLayout title="Metrio · Webs para tu club">
+  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+    <!-- Hero -->
+    <header class="relative overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(249,115,22,0.25),transparent)]" />
+      <div class="relative max-w-6xl mx-auto px-6 py-24 md:py-32 text-center">
+        <h1 class="text-4xl md:text-6xl font-bold tracking-tight">
+          Metrio
+        </h1>
+        <p class="mt-4 text-xl text-slate-300 max-w-2xl mx-auto">
+          La plataforma web para tu club. Noticias, jornadas, equipos y contacto en un solo sitio.
+        </p>
+        <div class="mt-10 flex flex-wrap justify-center gap-4">
+          {clubList.map((club) => (
+            <a
+              href={`/club/${club.slug}`}
+              class="inline-flex items-center gap-3 px-6 py-3.5 rounded-xl bg-white/10 hover:bg-orange-500/90 border border-white/10 hover:border-orange-400 text-white font-medium transition"
+            >
+              <img src={club.logo} alt="" class="h-8 w-8 rounded-full object-contain" />
+              {club.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    </header>
+
+    <!-- Acceso administración -->
+    <section class="border-t border-white/10">
+      <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col sm:flex-row items-center justify-center gap-4 text-slate-400 text-sm">
+        <span>¿Eres administrador del club?</span>
+        <a
+          href="/admin/login"
+          class="text-orange-400 hover:text-orange-300 font-medium"
+        >
+          Acceder al panel →
+        </a>
+      </div>
+    </section>
+
+    <footer class="border-t border-white/10 py-8 text-center text-slate-500 text-sm">
+      © {new Date().getFullYear()} Metrio. Webs para clubs.
+    </footer>
+  </div>
+</BaseLayout>

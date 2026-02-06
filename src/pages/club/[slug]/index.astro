@@ -1,0 +1,158 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ClubHeader from "../../../components/ClubHeader.astro";
+import ClubFooter from "../../../components/ClubFooter.astro";
+import { clubs } from "../../../data/clubs";
+
+const { slug } = Astro.params;
+const club = clubs[slug];
+
+const latestNews = [
+  {
+    title: "Victoria importante del primer equipo",
+    date: "10 Febrero",
+    image: club?.logo ?? "/favicon.svg",
+  },
+  {
+    title: "Cambio de horarios esta semana",
+    date: "8 Febrero",
+    image: club?.logo ?? "/favicon.svg",
+  },
+];
+
+const nextMatchday = {
+  name: "Jornada 18",
+  matches: [
+    { team: "Infantil A", rival: "CD Torrent", time: "Sáb · 10:30" },
+    { team: "Cadete B", rival: "Valencia CF", time: "Sáb · 12:00" },
+  ],
+};
+---
+
+<BaseLayout
+  title={club?.name ?? "Club no encontrado"}
+  color={club?.color}
+>
+  {!club ? (
+    <div class="min-h-[60vh] flex items-center justify-center px-6">
+      <div class="text-center">
+        <h1 class="text-2xl font-bold text-gray-900">Club no encontrado</h1>
+        <p class="mt-2 text-gray-600">El club que buscas no existe o no está disponible.</p>
+        <a href="/" class="mt-6 inline-block text-orange-600 font-medium hover:underline">Volver al inicio</a>
+      </div>
+    </div>
+  ) : (
+    <>
+      <!-- HEADER -->
+      <ClubHeader
+        clubName={club.name}
+        slug={slug}
+        logoUrl={club.logo}
+      />
+
+      <!-- CABECERA INSTITUCIONAL -->
+      <section class="border-b border-gray-200 bg-white">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+          <h1 class="text-4xl font-bold text-gray-900">
+            {club.name}
+          </h1>
+
+          <p class="mt-4 max-w-3xl text-gray-600">
+            Web oficial del {club.name}. Información actualizada sobre
+            noticias, horarios y resultados de todas las categorías del club.
+          </p>
+        </div>
+      </section>
+
+      <!-- CONTENIDO PRINCIPAL -->
+      <section class="bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6 py-14 grid gap-12 md:grid-cols-2">
+
+          <!-- Últimas noticias -->
+          <div>
+            <h2 class="text-xl font-semibold mb-6 text-gray-900">
+              Últimas noticias
+            </h2>
+
+            <ul class="divide-y divide-gray-200 bg-white border border-gray-200 rounded-lg">
+              {latestNews.map(item => (
+                <li class="flex gap-4 p-5 hover:bg-gray-50 transition">
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    class="w-20 h-16 object-cover rounded-md flex-shrink-0"
+                  />
+
+                  <div>
+                    <p class="font-medium text-gray-900 leading-snug">
+                      {item.title}
+                    </p>
+                    <span class="block mt-1 text-sm text-gray-500">
+                      {item.date}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Próxima jornada -->
+          <div>
+            <h2 class="text-xl font-semibold mb-6 text-gray-900">
+              Próxima jornada
+            </h2>
+
+            <div class="bg-white p-5 rounded-lg border border-gray-200">
+              <p class="font-medium text-gray-800 mb-4">
+                {nextMatchday.name}
+              </p>
+
+              <div class="space-y-3">
+                {nextMatchday.matches.map(match => (
+                  <div class="flex justify-between items-center text-sm">
+                    <span class="text-gray-700">
+                      {match.team} vs {match.rival}
+                    </span>
+                    <span class="font-medium text-gray-900">
+                      {match.time}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- PATROCINADORES -->
+      <section class="bg-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+          <h2
+            class="text-sm uppercase tracking-wide font-semibold mb-6"
+            style="color: var(--club-color)"
+          >
+            Patrocinadores
+          </h2>
+
+          <div class="flex flex-wrap items-center gap-8">
+            <img
+              src="/assets/logos/el-rumbo.png"
+              alt="Patrocinador"
+              class="h-12 object-contain opacity-90 hover:opacity-100 transition"
+            />
+            <!-- Duplica si hay más -->
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <ClubFooter
+        clubName={club.name}
+        slug={slug}
+      />
+    </>
+  )}
+</BaseLayout>
