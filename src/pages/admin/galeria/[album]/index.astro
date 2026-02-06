@@ -1,0 +1,1266 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Gestión de Fotografía · Subir Imágenes">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 to-neutral-100">
+
+    <!-- Cabecera de Navegación -->
+    <header class="bg-white/95 backdrop-blur-sm shadow-sm border-b border-neutral-200 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <a 
+            href="/admin/galeria" 
+            class="text-neutral-600 hover:text-neutral-900 transition-all duration-300 p-2 hover:bg-neutral-100 rounded-lg group"
+            title="Volver a galería"
+          >
+            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </a>
+          <div class="h-6 w-px bg-neutral-200"></div>
+          <div class="flex items-center space-x-3">
+            <div class="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-sm">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="font-semibold text-neutral-900">Gestión de Fotografía</h1>
+              <p class="text-xs text-neutral-500">Subida de imágenes al álbum</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+          <div class="hidden md:flex items-center space-x-3 text-sm bg-gradient-to-r from-green-50 to-emerald-50 px-3 py-1.5 rounded-full border border-green-100">
+            <div class="h-2 w-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-pulse"></div>
+            <span class="text-green-700 font-medium">Conectado</span>
+          </div>
+          <button
+            id="logout"
+            class="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-red-700 hover:bg-red-50 rounded-lg transition-all duration-300 flex items-center space-x-2 group"
+          >
+            <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      <!-- Cabecera del Álbum -->
+      <div class="mb-10">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between lg:space-x-8">
+          <div class="flex-1">
+            <div class="flex items-center space-x-4 mb-3">
+              <h2 class="text-3xl md:text-4xl font-bold text-neutral-900 bg-gradient-to-r from-neutral-900 to-neutral-700 bg-clip-text text-transparent">
+                Subir Imágenes
+              </h2>
+              <span class="px-3 py-1 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
+                Álbum Activo
+              </span>
+            </div>
+            <p class="text-neutral-600 max-w-3xl">
+              Añade fotografías al álbum seleccionado. Soporta formatos JPG, PNG y WebP. Optimiza tus imágenes para una mejor experiencia.
+            </p>
+          </div>
+          
+          <div class="mt-6 lg:mt-0 flex items-center space-x-6">
+            <div class="text-right">
+              <p class="text-sm text-neutral-500 font-medium">Límite por imagen</p>
+              <p class="text-xl font-bold text-neutral-900">10 MB</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-neutral-500 font-medium">Resolución óptima</p>
+              <p class="text-xl font-bold text-neutral-900">1920px</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel de Subida -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        
+        <!-- Área de Subida Principal -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-lg shadow-neutral-200/50 overflow-hidden transition-all duration-500 hover:shadow-xl hover:shadow-neutral-300/50">
+            <div class="px-8 py-6 border-b border-neutral-200 bg-gradient-to-r from-white to-neutral-50">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xl font-bold text-neutral-900">Subida de Archivos</h3>
+                  <p class="text-sm text-neutral-600 mt-1 flex items-center">
+                    <svg class="w-4 h-4 mr-1.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Selecciona o arrastra las imágenes directamente
+                  </p>
+                </div>
+                <div class="hidden md:block">
+                  <span id="session-timer" class="text-xs font-medium px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded-full border border-blue-200">
+                    Sesión: 59:59
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-8">
+              <!-- Zona de Drop -->
+              <div 
+                id="drop-zone"
+                class="border-3 border-dashed border-neutral-300 rounded-xl p-12 text-center transition-all duration-500 hover:border-blue-400 hover:bg-gradient-to-br hover:from-blue-50/50 hover:to-indigo-50/50 cursor-pointer group"
+              >
+                <div class="relative inline-flex mb-6">
+                  <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                    <svg class="w-10 h-10 text-blue-600 group-hover:rotate-12 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                    </svg>
+                  </div>
+                  <div class="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                  </div>
+                </div>
+                
+                <p class="text-lg font-semibold text-neutral-900 mb-2 group-hover:text-blue-700 transition-colors">
+                  Arrastra imágenes aquí
+                </p>
+                <p class="text-sm text-neutral-500 mb-6 max-w-md mx-auto">
+                  O haz clic para seleccionar archivos desde tu dispositivo. Soporta múltiples selecciones.
+                </p>
+                
+                <input
+                  id="file-input"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                  class="hidden"
+                />
+
+                <button
+                  id="browse-btn"
+                  class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-95"
+                >
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                  </svg>
+                  Explorar Archivos
+                </button>
+
+                <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-neutral-400">
+                  <div class="text-center p-2 bg-neutral-50 rounded-lg">
+                    <div class="font-semibold text-neutral-600">JPG/PNG</div>
+                    <div>Soportados</div>
+                  </div>
+                  <div class="text-center p-2 bg-neutral-50 rounded-lg">
+                    <div class="font-semibold text-neutral-600">WebP</div>
+                    <div>Recomendado</div>
+                  </div>
+                  <div class="text-center p-2 bg-neutral-50 rounded-lg">
+                    <div class="font-semibold text-neutral-600">20 archivos</div>
+                    <div>Máximo</div>
+                  </div>
+                  <div class="text-center p-2 bg-neutral-50 rounded-lg">
+                    <div class="font-semibold text-neutral-600">10MB c/u</div>
+                    <div>Límite</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Previsualización -->
+              <div id="preview-container" class="mt-10 transition-all duration-500">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-lg font-bold text-neutral-900 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Archivos seleccionados
+                  </h4>
+                  <button
+                    id="select-all-btn"
+                    class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors hidden"
+                  >
+                    Seleccionar todos
+                  </button>
+                </div>
+                <div id="file-list" class="space-y-3 max-h-96 overflow-y-auto pr-2"></div>
+              </div>
+
+              <!-- Controles de Subida -->
+              <div class="mt-10 pt-8 border-t border-neutral-200">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <button
+                      id="upload-btn"
+                      class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-xl"
+                      disabled
+                    >
+                      <svg class="w-5 h-5 mr-3 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                      </svg>
+                      Iniciar Subida
+                    </button>
+                    
+                    <button
+                      id="clear-btn"
+                      class="inline-flex items-center px-6 py-4 bg-white border-2 border-neutral-300 text-neutral-700 font-semibold rounded-xl hover:bg-neutral-50 hover:border-neutral-400 transition-all duration-300 hover:scale-105 active:scale-95"
+                    >
+                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                      Limpiar Todo
+                    </button>
+                  </div>
+
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-neutral-900" id="file-count">0 archivos</div>
+                    <div class="text-sm text-neutral-500" id="total-size">0 MB total</div>
+                    <div class="text-xs text-neutral-400 mt-1" id="estimated-time">
+                      Tiempo estimado: --
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mensajes de Estado -->
+              <div id="upload-status" class="mt-6 space-y-3"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="space-y-8">
+          <!-- Información del Álbum -->
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-lg shadow-neutral-200/50 overflow-hidden hover:shadow-xl transition-all duration-500">
+            <div class="p-6">
+              <div class="flex items-center space-x-3 mb-5">
+                <div class="p-3 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl">
+                  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>
+                  </svg>
+                </div>
+                <h4 class="text-lg font-bold text-neutral-900">Información del Álbum</h4>
+              </div>
+              
+              <div class="space-y-4">
+                <div class="p-4 bg-gradient-to-r from-neutral-50 to-blue-50/50 rounded-xl border border-neutral-200">
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1">ID del Álbum</div>
+                  <div class="flex items-center">
+                    <div class="font-mono text-lg font-bold text-neutral-900" id="album-id"></div>
+                    <button class="ml-2 p-1 hover:bg-neutral-100 rounded transition-colors" title="Copiar ID">
+                      <svg class="w-4 h-4 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                  <div class="p-3 bg-neutral-50 rounded-lg">
+                    <div class="text-xs text-neutral-500">Permisos</div>
+                    <div class="text-sm font-semibold text-green-700 flex items-center mt-1">
+                      <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      Editor
+                    </div>
+                  </div>
+                  <div class="p-3 bg-neutral-50 rounded-lg">
+                    <div class="text-xs text-neutral-500">Estado</div>
+                    <div class="text-sm font-semibold text-blue-700 flex items-center mt-1">
+                      <div class="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+                      Activo
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="p-3 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 rounded-lg border border-blue-100">
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1">Carpeta de destino</div>
+                  <div class="text-sm text-neutral-700 truncate font-mono" id="storage-path"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progreso de Subida -->
+          <div id="progress-container" class="hidden">
+            <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-lg shadow-neutral-200/50 overflow-hidden transition-all duration-500">
+              <div class="p-6">
+                <div class="flex items-center space-x-3 mb-5">
+                  <div class="p-3 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <h4 class="text-lg font-bold text-neutral-900">Progreso de Subida</h4>
+                </div>
+                
+                <div class="space-y-4">
+                  <div>
+                    <div class="flex justify-between text-sm mb-2">
+                      <span class="text-neutral-600 font-medium">Progreso general</span>
+                      <span id="progress-percent" class="font-bold text-green-700">0%</span>
+                    </div>
+                    <div class="w-full h-3 bg-neutral-200 rounded-full overflow-hidden">
+                      <div id="progress-bar" class="h-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500 ease-out" style="width: 0%"></div>
+                    </div>
+                  </div>
+                  
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-neutral-50 rounded-lg">
+                      <div class="text-xs text-neutral-500">Completados</div>
+                      <div id="completed-count" class="text-xl font-bold text-green-700">0</div>
+                    </div>
+                    <div class="p-3 bg-neutral-50 rounded-lg">
+                      <div class="text-xs text-neutral-500">Restantes</div>
+                      <div id="remaining-count" class="text-xl font-bold text-blue-700">0</div>
+                    </div>
+                  </div>
+                  
+                  <div class="p-3 bg-gradient-to-r from-green-50/50 to-emerald-50/50 rounded-lg border border-green-100">
+                    <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-1">Archivo actual</div>
+                    <div id="progress-text" class="text-sm text-neutral-700 truncate">Preparando subida...</div>
+                    <div class="text-xs text-neutral-400 mt-1" id="current-speed">
+                      Velocidad: calculando...
+                    </div>
+                  </div>
+                  
+                  <div class="pt-3 border-t border-neutral-200">
+                    <div class="flex justify-between text-xs text-neutral-500">
+                      <span>Tiempo transcurrido:</span>
+                      <span id="elapsed-time">00:00</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-neutral-500 mt-1">
+                      <span>Tiempo estimado:</span>
+                      <span id="eta-time">--:--</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-200/80 shadow-lg shadow-blue-200/30 p-6">
+            <h4 class="text-lg font-bold text-blue-900 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+              Acciones Rápidas
+            </h4>
+            <div class="space-y-3">
+              <button
+                id="optimize-btn"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-blue-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-blue-700">Optimizar Imágenes</div>
+                    <div class="text-xs text-neutral-500">Reduce tamaño automáticamente</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+              
+              <button
+                id="rename-batch-btn"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-blue-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-green-700">Renombrar Lote</div>
+                    <div class="text-xs text-neutral-500">Aplicar nombre secuencial</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-green-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Galería Actual -->
+      <div class="mt-16">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between mb-8">
+          <div>
+            <h3 class="text-2xl md:text-3xl font-bold text-neutral-900 mb-2">Contenido del Álbum</h3>
+            <p class="text-neutral-600">Imágenes actualmente disponibles en la galería</p>
+          </div>
+          <div class="mt-4 lg:mt-0 flex items-center space-x-4">
+            <div class="text-right">
+              <div class="text-sm text-neutral-500">Total de imágenes</div>
+              <div class="text-2xl font-bold text-neutral-900" id="photo-count">--</div>
+            </div>
+            <button
+              id="refresh-gallery"
+              class="p-3 bg-gradient-to-r from-neutral-50 to-neutral-100 hover:from-white hover:to-neutral-200 rounded-xl border border-neutral-300 transition-all duration-300 hover:shadow-md"
+              title="Actualizar galería"
+            >
+              <svg class="w-5 h-5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-lg shadow-neutral-200/50 overflow-hidden transition-all duration-500 hover:shadow-xl">
+          <div id="photos-container" class="p-8">
+            <!-- Estado de Carga -->
+            <div id="photos-loading" class="text-center py-16">
+              <div class="inline-flex items-center justify-center mb-6">
+                <div class="relative">
+                  <div class="w-16 h-16 border-4 border-blue-100 rounded-full"></div>
+                  <div class="absolute top-0 left-0 w-16 h-16 border-4 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
+                </div>
+              </div>
+              <p class="text-lg font-medium text-neutral-700">Cargando galería...</p>
+              <p class="text-sm text-neutral-500 mt-2">Obteniendo información de las imágenes</p>
+            </div>
+            
+            <!-- Galería de Imágenes -->
+            <div id="photos-grid" class="hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"></div>
+            
+            <!-- Estado Vacío -->
+            <div id="photos-empty" class="hidden text-center py-20">
+              <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-3xl mb-6">
+                <svg class="w-12 h-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              </div>
+              <h4 class="text-2xl font-bold text-neutral-900 mb-3">Álbum Vacío</h4>
+              <p class="text-neutral-600 max-w-md mx-auto mb-8">
+                Comienza subiendo tus primeras fotografías para llenar esta galería. Puedes arrastrar archivos o usar el botón de explorar.
+              </p>
+              <button
+                onclick="document.getElementById('drop-zone').scrollIntoView({ behavior: 'smooth' })"
+                class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Subir Primeras Imágenes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { supabase } from "../../../../lib/supabaseClient";
+
+    // Estado global avanzado
+    let selectedFiles = new Map(); // Usar Map para mejor control
+    let uploadInProgress = false;
+    let albumId = null;
+    let uploadSessionStart = null;
+    let uploadStats = {
+      completed: 0,
+      failed: 0,
+      totalSize: 0,
+      startTime: null,
+      speeds: []
+    };
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Verificar sesión con timeout
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !sessionData.session) {
+          window.location.href = "/admin?error=session_expired&redirect=" + encodeURIComponent(window.location.pathname);
+          return;
+        }
+
+        const user = sessionData.session.user;
+
+        // Verificar permisos con carga visual
+        showNotification('info', 'Verificando permisos...', 2000);
+        
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role, club_id, full_name, avatar_url")
+          .eq("id", user.id)
+          .single();
+
+        if (profileError || !profile || !["admin", "fotos", "editor"].includes(profile.role)) {
+          showNotification('error', 'Acceso no autorizado. Redirigiendo...');
+          setTimeout(() => window.location.href = "/admin/dashboard", 2500);
+          return;
+        }
+
+        // Obtener ID del álbum
+        albumId = window.location.pathname.split("/").pop();
+        if (!albumId || isNaN(albumId)) {
+          showNotification('error', 'ID de álbum inválido');
+          setTimeout(() => window.location.href = "/admin/galeria", 2000);
+          return;
+        }
+
+        // Actualizar UI con información del álbum
+        document.getElementById('album-id').textContent = `#${albumId}`;
+        document.getElementById('storage-path').textContent = 
+          `${profile.club_id}/${albumId}/`;
+        
+        // Iniciar temporizador de sesión
+        startSessionTimer();
+        
+        // Configurar elementos y eventos
+        setupEventListeners(profile, user);
+        
+        // Cargar imágenes existentes
+        await loadAlbumPhotos();
+        
+        // Configurar acciones rápidas
+        setupQuickActions(profile);
+        
+        // Mostrar notificación de bienvenida
+        setTimeout(() => {
+          showNotification('success', `Conectado como ${profile.full_name || user.email}`);
+        }, 500);
+
+      } catch (error) {
+        console.error('Error de inicialización:', error);
+        showNotification('error', 'Error al cargar la página. Intenta recargar.');
+      }
+    });
+
+    function setupEventListeners(profile, user) {
+      const dropZone = document.getElementById('drop-zone');
+      const fileInput = document.getElementById('file-input');
+      const browseBtn = document.getElementById('browse-btn');
+      const uploadBtn = document.getElementById('upload-btn');
+      const clearBtn = document.getElementById('clear-btn');
+      const selectAllBtn = document.getElementById('select-all-btn');
+      const refreshBtn = document.getElementById('refresh-gallery');
+      const logoutBtn = document.getElementById('logout');
+      const optimizeBtn = document.getElementById('optimize-btn');
+      const renameBtn = document.getElementById('rename-batch-btn');
+
+      // Explorar archivos
+      browseBtn.addEventListener('click', () => {
+        fileInput.click();
+        // Animación de feedback
+        browseBtn.classList.add('active:scale-95');
+        setTimeout(() => browseBtn.classList.remove('active:scale-95'), 150);
+      });
+      
+      // Cambio en input de archivos
+      fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+        // Reset input para permitir seleccionar los mismos archivos de nuevo
+        fileInput.value = '';
+      });
+
+      // Drag & Drop
+      dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('border-blue-500', 'bg-gradient-to-br', 'from-blue-100/50', 'to-indigo-100/50');
+        dropZone.classList.remove('border-neutral-300');
+      });
+
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('border-blue-500', 'bg-gradient-to-br', 'from-blue-100/50', 'to-indigo-100/50');
+        dropZone.classList.add('border-neutral-300');
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('border-blue-500', 'bg-gradient-to-br', 'from-blue-100/50', 'to-indigo-100/50');
+        dropZone.classList.add('border-neutral-300');
+        
+        if (e.dataTransfer.files.length) {
+          handleFiles(e.dataTransfer.files);
+          // Animación de confirmación
+          dropZone.style.transform = 'scale(0.98)';
+          setTimeout(() => {
+            dropZone.style.transform = 'scale(1)';
+          }, 200);
+        }
+      });
+
+      // Botón subir
+      uploadBtn.addEventListener('click', async () => {
+        if (uploadInProgress || selectedFiles.size === 0) return;
+        
+        // Confirmación antes de subir
+        if (selectedFiles.size > 10) {
+          if (!confirm(`¿Estás seguro de subir ${selectedFiles.size} imágenes? Esto podría tomar unos minutos.`)) {
+            return;
+          }
+        }
+        
+        await uploadFiles(profile, user);
+      });
+
+      // Limpiar selección
+      clearBtn.addEventListener('click', () => {
+        if (uploadInProgress) {
+          showNotification('warning', 'Hay una subida en progreso. Espera a que termine.');
+          return;
+        }
+        
+        if (selectedFiles.size > 0) {
+          if (confirm('¿Deseas limpiar todos los archivos seleccionados?')) {
+            clearSelection();
+          }
+        }
+      });
+
+      // Seleccionar todos
+      selectAllBtn.addEventListener('click', () => {
+        // Implementación de selección múltiple
+        document.querySelectorAll('.file-item-select').forEach(checkbox => {
+          checkbox.checked = !checkbox.checked;
+          const fileId = checkbox.dataset.fileId;
+          const file = selectedFiles.get(fileId);
+          if (file) {
+            file.selected = checkbox.checked;
+          }
+        });
+        updateUI();
+      });
+
+      // Refrescar galería
+      refreshBtn.addEventListener('click', async () => {
+        refreshBtn.classList.add('rotate-180');
+        setTimeout(() => refreshBtn.classList.remove('rotate-180'), 500);
+        await loadAlbumPhotos();
+      });
+
+      // Logout
+      logoutBtn.addEventListener('click', async () => {
+        if (uploadInProgress) {
+          const confirmExit = confirm('Hay una subida en progreso. ¿Estás seguro de querer salir? Los archivos no subidos se perderán.');
+          if (!confirmExit) return;
+        }
+        
+        await supabase.auth.signOut();
+        window.location.href = "/admin?message=logged_out";
+      });
+
+      // Optimizar imágenes
+      optimizeBtn.addEventListener('click', () => {
+        showNotification('info', 'Funcionalidad de optimización en desarrollo', 3000);
+      });
+
+      // Renombrar lote
+      renameBtn.addEventListener('click', () => {
+        if (selectedFiles.size === 0) {
+          showNotification('warning', 'Selecciona archivos primero para renombrar');
+          return;
+        }
+        
+        const baseName = prompt('Ingresa el nombre base para los archivos (ej: "evento-")');
+        if (baseName) {
+          let counter = 1;
+          selectedFiles.forEach((file, id) => {
+            const extension = file.name.split('.').pop();
+            file.name = `${baseName}${counter}.${extension}`;
+            counter++;
+          });
+          updateFileList();
+          showNotification('success', 'Archivos renombrados exitosamente');
+        }
+      });
+    }
+
+    function handleFiles(files) {
+      const validFiles = Array.from(files).filter(file => {
+        // Validar tipo
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        if (!validTypes.includes(file.type)) {
+          showNotification('error', `${file.name}: Formato no soportado`);
+          return false;
+        }
+        
+        // Validar tamaño (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          showNotification('error', `${file.name}: Supera el límite de 10MB`);
+          return false;
+        }
+        
+        // Validar resolución (opcional, se puede implementar con FileReader)
+        
+        return true;
+      });
+
+      if (validFiles.length === 0) return;
+
+      // Agregar archivos con ID único
+      validFiles.forEach(file => {
+        const fileId = Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        selectedFiles.set(fileId, {
+          file,
+          id: fileId,
+          selected: true,
+          uploadStatus: 'pending'
+        });
+      });
+
+      updateFileList();
+      updateUI();
+      showNotification('success', `${validFiles.length} archivo(s) añadido(s)`);
+    }
+
+    function updateFileList() {
+      const fileList = document.getElementById('file-list');
+      const previewContainer = document.getElementById('preview-container');
+      
+      if (selectedFiles.size === 0) {
+        previewContainer.classList.add('hidden');
+        return;
+      }
+
+      fileList.innerHTML = '';
+      let totalSizeBytes = 0;
+
+      selectedFiles.forEach((fileData, fileId) => {
+        const file = fileData.file;
+        totalSizeBytes += file.size;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const div = document.createElement('div');
+          div.className = 'file-item flex items-center justify-between p-4 bg-gradient-to-r from-neutral-50 to-white rounded-xl border border-neutral-200 hover:border-blue-300 transition-all duration-300 group';
+          div.innerHTML = `
+            <div class="flex items-center space-x-4 flex-1 min-w-0">
+              <input
+                type="checkbox"
+                class="file-item-select h-5 w-5 text-blue-600 rounded border-neutral-300 focus:ring-blue-500"
+                data-file-id="${fileId}"
+                ${fileData.selected ? 'checked' : ''}
+              />
+              <div class="w-16 h-16 rounded-lg overflow-hidden bg-gradient-to-br from-neutral-200 to-neutral-300 flex-shrink-0">
+                <img 
+                  src="${e.target.result}" 
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  alt="Preview"
+                  loading="lazy"
+                />
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <p class="font-semibold text-neutral-900 truncate" title="${file.name}">${file.name}</p>
+                  <span class="text-xs font-medium px-2 py-1 rounded-full ${
+                    fileData.uploadStatus === 'pending' ? 'bg-amber-100 text-amber-800' :
+                    fileData.uploadStatus === 'uploading' ? 'bg-blue-100 text-blue-800' :
+                    fileData.uploadStatus === 'completed' ? 'bg-green-100 text-green-800' :
+                    'bg-red-100 text-red-800'
+                  }">
+                    ${fileData.uploadStatus === 'pending' ? 'Pendiente' :
+                      fileData.uploadStatus === 'uploading' ? 'Subiendo...' :
+                      fileData.uploadStatus === 'completed' ? 'Completado' : 'Error'}
+                  </span>
+                </div>
+                <div class="flex items-center space-x-4 text-sm text-neutral-500">
+                  <span>${formatFileSize(file.size)}</span>
+                  <span>•</span>
+                  <span>${file.type.split('/')[1].toUpperCase()}</span>
+                  <span>•</span>
+                  <span>${Math.round(file.size / 1024) > 1024 ? 
+                    (file.size / (1024*1024)).toFixed(1) + ' MB' : 
+                    Math.round(file.size / 1024) + ' KB'}</span>
+                </div>
+                <div class="mt-2 w-full bg-neutral-200 rounded-full h-1.5 hidden">
+                  <div class="upload-progress h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300" style="width: 0%"></div>
+                </div>
+              </div>
+            </div>
+            <button 
+              class="remove-file ml-4 p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-300 opacity-0 group-hover:opacity-100"
+              data-file-id="${fileId}"
+              title="Eliminar archivo"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          `;
+          fileList.appendChild(div);
+          
+          // Eventos para elementos específicos del archivo
+          const checkbox = div.querySelector('.file-item-select');
+          const removeBtn = div.querySelector('.remove-file');
+          
+          checkbox.addEventListener('change', (e) => {
+            const id = e.target.dataset.fileId;
+            const fileData = selectedFiles.get(id);
+            if (fileData) {
+              fileData.selected = e.target.checked;
+              updateUI();
+            }
+          });
+          
+          removeBtn.addEventListener('click', (e) => {
+            const id = e.currentTarget.dataset.fileId;
+            selectedFiles.delete(id);
+            updateFileList();
+            updateUI();
+            showNotification('info', 'Archivo removido de la lista');
+          });
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Mostrar contenedor de preview
+      previewContainer.classList.remove('hidden');
+      
+      // Mostrar botón de seleccionar todos si hay más de 1 archivo
+      const selectAllBtn = document.getElementById('select-all-btn');
+      selectAllBtn.classList.toggle('hidden', selectedFiles.size <= 1);
+      
+      // Actualizar estadísticas
+      document.getElementById('file-count').textContent = `${selectedFiles.size} archivo${selectedFiles.size !== 1 ? 's' : ''}`;
+      document.getElementById('total-size').textContent = formatFileSize(totalSizeBytes);
+      
+      // Calcular tiempo estimado (asumiendo velocidad de 5MB/min)
+      const estimatedMinutes = Math.ceil(totalSizeBytes / (5 * 1024 * 1024));
+      const estimatedTime = estimatedMinutes > 0 ? 
+        `~${estimatedMinutes} minuto${estimatedMinutes !== 1 ? 's' : ''}` : 
+        '< 1 minuto';
+      document.getElementById('estimated-time').textContent = `Tiempo estimado: ${estimatedTime}`;
+    }
+
+    function updateUI() {
+      const uploadBtn = document.getElementById('upload-btn');
+      const clearBtn = document.getElementById('clear-btn');
+      const selectedCount = Array.from(selectedFiles.values()).filter(f => f.selected).length;
+      
+      uploadBtn.disabled = selectedCount === 0 || uploadInProgress;
+      clearBtn.disabled = selectedFiles.size === 0 || uploadInProgress;
+      
+      // Actualizar texto del botón de subida
+      if (selectedCount > 0) {
+        uploadBtn.innerHTML = `
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+          Subir ${selectedCount} Imagen${selectedCount !== 1 ? 'es' : ''}
+        `;
+      } else {
+        uploadBtn.innerHTML = `
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+          Subir Imágenes
+        `;
+      }
+    }
+
+    function clearSelection() {
+      selectedFiles.clear();
+      updateFileList();
+      updateUI();
+      document.getElementById('upload-status').innerHTML = '';
+      showNotification('info', 'Selección limpiada');
+    }
+
+    async function uploadFiles(profile, user) {
+      if (uploadInProgress) return;
+      
+      uploadInProgress = true;
+      uploadSessionStart = Date.now();
+      uploadStats = {
+        completed: 0,
+        failed: 0,
+        totalSize: 0,
+        startTime: uploadSessionStart,
+        speeds: []
+      };
+      
+      updateUI();
+      
+      // Mostrar panel de progreso
+      const progressContainer = document.getElementById('progress-container');
+      progressContainer.classList.remove('hidden');
+      
+      const progressBar = document.getElementById('progress-bar');
+      const progressPercent = document.getElementById('progress-percent');
+      const progressText = document.getElementById('progress-text');
+      const completedCount = document.getElementById('completed-count');
+      const remainingCount = document.getElementById('remaining-count');
+      const elapsedTime = document.getElementById('elapsed-time');
+      const etaTime = document.getElementById('eta-time');
+      const currentSpeed = document.getElementById('current-speed');
+      
+      // Filtrar archivos seleccionados
+      const filesToUpload = Array.from(selectedFiles.entries())
+        .filter(([id, data]) => data.selected && data.uploadStatus === 'pending')
+        .map(([id, data]) => ({ id, data }));
+      
+      uploadStats.totalSize = filesToUpload.reduce((sum, { data }) => sum + data.file.size, 0);
+      
+      // Configurar intervalos para actualizar tiempos
+      const timerInterval = setInterval(() => {
+        const elapsedSeconds = Math.floor((Date.now() - uploadStats.startTime) / 1000);
+        elapsedTime.textContent = formatTime(elapsedSeconds);
+        
+        // Calcular velocidad promedio
+        if (uploadStats.completed > 0) {
+          const avgSpeed = (uploadStats.totalSize / elapsedSeconds) / 1024; // KB/s
+          currentSpeed.textContent = `Velocidad: ${avgSpeed.toFixed(1)} KB/s`;
+          
+          // Calcular ETA
+          const remainingFiles = filesToUpload.length - uploadStats.completed - uploadStats.failed;
+          if (remainingFiles > 0 && avgSpeed > 0) {
+            const remainingSize = filesToUpload
+              .slice(uploadStats.completed + uploadStats.failed)
+              .reduce((sum, { data }) => sum + data.file.size, 0);
+            const etaSeconds = remainingSize / (avgSpeed * 1024);
+            etaTime.textContent = formatTime(Math.ceil(etaSeconds));
+          }
+        }
+      }, 1000);
+      
+      // Subir archivos secuencialmente
+      for (let i = 0; i < filesToUpload.length; i++) {
+        const { id, data } = filesToUpload[i];
+        const file = data.file;
+        
+        // Actualizar estado del archivo
+        selectedFiles.get(id).uploadStatus = 'uploading';
+        updateFileList();
+        
+        // Actualizar texto de progreso
+        progressText.textContent = `Subiendo: ${file.name}`;
+        progressText.title = file.name;
+        
+        try {
+          // Preparar nombre de archivo seguro
+          const timestamp = Date.now();
+          const originalName = file.name;
+          const safeName = originalName
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9._-]/g, '_')
+            .replace(/_+/g, '_');
+          
+          const path = `${profile.club_id}/${albumId}/${timestamp}_${safeName}`;
+          
+          // Mostrar progreso individual
+          const fileItem = document.querySelector(`[data-file-id="${id}"]`).closest('.file-item');
+          const progressBarEl = fileItem.querySelector('.upload-progress');
+          const progressContainerEl = fileItem.querySelector('.bg-neutral-200');
+          
+          if (progressContainerEl) {
+            progressContainerEl.classList.remove('hidden');
+          }
+          
+          // Subir con supabase
+          const uploadStartTime = Date.now();
+          const { error: uploadError } = await supabase.storage
+            .from('gallery')
+            .upload(path, file, {
+              cacheControl: '31536000', // 1 año
+              upsert: false,
+              contentType: file.type
+            });
+          
+          if (uploadError) throw uploadError;
+          
+          // Calcular velocidad de subida
+          const uploadTime = (Date.now() - uploadStartTime) / 1000;
+          const uploadSpeed = file.size / uploadTime / 1024; // KB/s
+          uploadStats.speeds.push(uploadSpeed);
+          
+          // Obtener URL pública
+          const { data: urlData } = supabase.storage
+            .from('gallery')
+            .getPublicUrl(path);
+          
+          // Registrar en base de datos
+          const { error: dbError } = await supabase
+            .from('photos')
+            .insert({
+              album_id: albumId,
+              image_url: urlData.publicUrl,
+              file_name: safeName,
+              original_name: originalName,
+              file_size: file.size,
+              uploaded_by: user.id,
+              mime_type: file.type,
+              dimensions: await getImageDimensions(file)
+            });
+          
+          if (dbError) throw dbError;
+          
+          // Marcar como completado
+          selectedFiles.get(id).uploadStatus = 'completed';
+          uploadStats.completed++;
+          
+          // Actualizar progreso general
+          const progress = ((uploadStats.completed + uploadStats.failed) / filesToUpload.length) * 100;
+          progressBar.style.width = `${progress}%`;
+          progressPercent.textContent = `${Math.round(progress)}%`;
+          completedCount.textContent = uploadStats.completed;
+          remainingCount.textContent = filesToUpload.length - uploadStats.completed - uploadStats.failed;
+          
+          // Actualizar barra individual
+          if (progressBarEl) {
+            progressBarEl.style.width = '100%';
+          }
+          
+        } catch (error) {
+          console.error('Error subiendo archivo:', error);
+          selectedFiles.get(id).uploadStatus = 'failed';
+          uploadStats.failed++;
+          
+          showNotification('error', `Error al subir "${file.name}": ${error.message}`);
+        }
+        
+        // Pequeña pausa para no saturar
+        if (i < filesToUpload.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+      
+      // Limpiar intervalos
+      clearInterval(timerInterval);
+      
+      // Finalizar proceso
+      uploadInProgress = false;
+      progressText.textContent = 'Subida completada';
+      
+      // Mostrar resumen
+      const totalTime = Math.floor((Date.now() - uploadSessionStart) / 1000);
+      const avgSpeed = uploadStats.speeds.length > 0 ? 
+        uploadStats.speeds.reduce((a, b) => a + b, 0) / uploadStats.speeds.length : 0;
+      
+      showNotification(
+        'success', 
+        `Subida completada: ${uploadStats.completed} exitosas, ${uploadStats.failed} fallidas. Tiempo: ${formatTime(totalTime)}`
+      );
+      
+      // Actualizar UI
+      updateUI();
+      
+      // Recargar galería después de 2 segundos
+      setTimeout(async () => {
+        await loadAlbumPhotos();
+        
+        // Limpiar archivos subidos exitosamente
+        Array.from(selectedFiles.entries()).forEach(([id, data]) => {
+          if (data.uploadStatus === 'completed') {
+            selectedFiles.delete(id);
+          }
+        });
+        
+        updateFileList();
+        updateUI();
+        
+        // Ocultar panel de progreso después de 5 segundos
+        setTimeout(() => {
+          progressContainer.classList.add('hidden');
+          progressBar.style.width = '0%';
+          progressPercent.textContent = '0%';
+        }, 5000);
+        
+      }, 2000);
+    }
+
+    async function loadAlbumPhotos() {
+      const loadingEl = document.getElementById('photos-loading');
+      const gridEl = document.getElementById('photos-grid');
+      const emptyEl = document.getElementById('photos-empty');
+      const photoCountEl = document.getElementById('photo-count');
+      
+      loadingEl.classList.remove('hidden');
+      gridEl.classList.add('hidden');
+      emptyEl.classList.add('hidden');
+      
+      try {
+        const { data: photos, error } = await supabase
+          .from('photos')
+          .select('*, profiles:uploaded_by(full_name)')
+          .eq('album_id', albumId)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        loadingEl.classList.add('hidden');
+        
+        if (!photos || photos.length === 0) {
+          emptyEl.classList.remove('hidden');
+          photoCountEl.textContent = '0 imágenes';
+          return;
+        }
+        
+        gridEl.innerHTML = '';
+        photos.forEach(photo => {
+          const uploadedBy = photo.profiles?.full_name || 'Usuario';
+          const uploadDate = new Date(photo.created_at).toLocaleDateString('es-ES', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+          });
+          const fileSize = photo.file_size ? formatFileSize(photo.file_size) : 'N/A';
+          
+          const div = document.createElement('div');
+          div.className = 'group relative overflow-hidden rounded-2xl border border-neutral-200 hover:border-blue-300 transition-all duration-500 hover:shadow-xl';
+          div.innerHTML = `
+            <div class="aspect-square bg-gradient-to-br from-neutral-100 to-neutral-200 overflow-hidden">
+              <img 
+                src="${photo.image_url}" 
+                alt="${photo.original_name || photo.file_name || 'Imagen del álbum'}"
+                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                loading="lazy"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            </div>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+              <div class="bg-white/95 backdrop-blur-sm rounded-xl p-3 shadow-lg">
+                <p class="font-semibold text-neutral-900 text-sm truncate" title="${photo.original_name || photo.file_name}">
+                  ${photo.original_name || photo.file_name}
+                </p>
+                <div class="flex items-center justify-between mt-2 text-xs text-neutral-500">
+                  <span>${uploadDate}</span>
+                  <span>${fileSize}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <button class="p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-md hover:shadow-lg transition-shadow" title="Ver detalles">
+                <svg class="w-4 h-4 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+            </div>
+          `;
+          gridEl.appendChild(div);
+        });
+        
+        gridEl.classList.remove('hidden');
+        photoCountEl.textContent = `${photos.length} imagen${photos.length !== 1 ? 'es' : ''}`;
+        
+      } catch (error) {
+        console.error('Error cargando fotos:', error);
+        loadingEl.classList.add('hidden');
+        emptyEl.classList.remove('hidden');
+        showNotification('error', 'Error al cargar la galería');
+      }
+    }
+
+    function setupQuickActions(profile) {
+      // Aquí se pueden añadir funcionalidades adicionales
+      // como optimización de imágenes, renombrado batch, etc.
+    }
+
+    function startSessionTimer() {
+      let seconds = 0;
+      const timerEl = document.getElementById('session-timer');
+      
+      const interval = setInterval(() => {
+        seconds++;
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        timerEl.textContent = `Sesión: ${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+      }, 1000);
+      
+      // Limpiar al salir
+      window.addEventListener('beforeunload', () => clearInterval(interval));
+    }
+
+    // Funciones utilitarias
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      
+      if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+      return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function showNotification(type, message, duration = 5000) {
+      const notification = document.createElement('div');
+      const colors = {
+        success: { bg: 'from-green-500 to-emerald-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+        error: { bg: 'from-red-500 to-rose-500', icon: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+        warning: { bg: 'from-amber-500 to-yellow-500', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.856-.833-2.624 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5' },
+        info: { bg: 'from-blue-500 to-indigo-500', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' }
+      };
+      
+      notification.className = `fixed top-6 right-6 z-50 max-w-md transform transition-all duration-500 translate-x-full`;
+      notification.innerHTML = `
+        <div class="bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden">
+          <div class="flex items-start p-4">
+            <div class="flex-shrink-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r ${colors[type].bg} flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${colors[type].icon}"/>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p class="text-sm font-medium text-neutral-900">${message}</p>
+            </div>
+            <button class="ml-4 flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors" onclick="this.parentElement.parentElement.parentElement.remove()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="h-1 w-full bg-gradient-to-r ${colors[type].bg}"></div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Animar entrada
+      requestAnimationFrame(() => {
+        notification.classList.remove('translate-x-full');
+      });
+      
+      // Auto-eliminar
+      setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => notification.remove(), 500);
+      }, duration);
+    }
+
+    async function getImageDimensions(file) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = function() {
+          resolve(`${this.width}x${this.height}`);
+        };
+        img.onerror = function() {
+          resolve(null);
+        };
+        img.src = URL.createObjectURL(file);
+      });
+    }
+  </script>
+</BaseLayout>

@@ -1,0 +1,56 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import ClubHeader from "../../../../components/ClubHeader.astro";
+
+const { slug } = Astro.params;
+
+const clubName = slug
+  .split("-")
+  .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+  .join(" ");
+
+// MOCK de jornadas
+const matchdays = [
+  {
+    name: "Jornada 1",
+    matches: [
+      { team: "Infantil A", rival: "CD Torrent", result: "2 - 1" },
+      { team: "Cadete B", rival: "Valencia CF", result: null },
+    ],
+  },
+  {
+    name: "Jornada 2",
+    matches: [
+      { team: "Infantil A", rival: "Levante UD", result: "1 - 1" },
+    ],
+  },
+];
+---
+<BaseLayout title={`Jornadas · ${clubName}`}>
+  <ClubHeader clubName={clubName} slug={slug} />
+
+  <section class="mt-8">
+    <h1 class="text-2xl font-bold mb-6">Jornadas</h1>
+
+    <div class="space-y-8">
+      {matchdays.map(day => (
+        <div>
+          <h2 class="font-semibold mb-3">{day.name}</h2>
+
+          <div class="space-y-2">
+            {day.matches.map(match => (
+              <div class="bg-white p-4 rounded shadow-sm flex justify-between">
+                <span>{match.team} vs {match.rival}</span>
+                <span class="font-medium">
+                  {match.result ?? "Pendiente"}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

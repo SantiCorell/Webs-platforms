@@ -1,0 +1,71 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { supabase } from "@/lib/supabaseClient";
+---
+
+<BaseLayout title="Acceso administración">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    
+    <div class="w-full max-w-md bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl p-8">
+      
+      <h1 class="text-2xl font-semibold text-white mb-2">
+        Acceso administración
+      </h1>
+      <p class="text-sm text-gray-400 mb-6">
+        Inicia sesión para gestionar tu club
+      </p>
+
+      <div class="space-y-4">
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          class="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
+
+        <input
+          id="password"
+          type="password"
+          placeholder="Contraseña"
+          class="w-full rounded-lg bg-gray-800 border border-gray-700 px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500"
+        />
+
+        <button
+          id="login"
+          class="w-full bg-orange-500 hover:bg-orange-600 text-black font-semibold py-2 rounded-lg transition"
+        >
+          Entrar
+        </button>
+      </div>
+
+      <p id="error" class="text-sm text-red-400 mt-4 hidden"></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("login").onclick = async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorText = document.getElementById("error");
+
+      errorText.classList.add("hidden");
+
+      const { error } = await window.supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        errorText.textContent = error.message;
+        errorText.classList.remove("hidden");
+      } else {
+        window.location.href = "/admin/club";
+      }
+    };
+  </script>
+
+  <script type="module">
+    import { supabase } from "/src/lib/supabaseClient";
+    window.supabase = supabase;
+  </script>
+</BaseLayout>

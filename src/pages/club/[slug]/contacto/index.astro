@@ -1,0 +1,109 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+import ClubHeader from "../../../../components/ClubHeader.astro";
+import ClubFooter from "../../../../components/ClubFooter.astro";
+import { clubs } from "../../../../data/clubs";
+
+const { slug } = Astro.params;
+const club = clubs[slug];
+---
+
+<BaseLayout
+  title={`Contacto · ${club?.name ?? "Club"}`}
+  color={club?.color}
+>
+  {club && (
+    <>
+      <!-- HEADER -->
+      <ClubHeader
+        clubName={club.name}
+        slug={slug}
+        logoUrl={club.logo}
+      />
+
+      <!-- CABECERA -->
+      <section class="border-b border-gray-200 bg-white">
+        <div class="max-w-5xl mx-auto px-6 py-12">
+          <h1 class="text-3xl font-bold text-gray-900">
+            Contacto
+          </h1>
+
+          <p class="mt-4 max-w-3xl text-gray-600">
+            Si deseas ponerte en contacto con el {club.name} para cualquier
+            consulta, información deportiva o colaboración, puedes hacerlo
+            a través de los siguientes medios.
+          </p>
+        </div>
+      </section>
+
+      <!-- INFORMACIÓN DE CONTACTO -->
+      <section class="bg-gray-50">
+        <div class="max-w-5xl mx-auto px-6 py-14 grid gap-8 md:grid-cols-2">
+
+          <!-- Datos -->
+          <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">
+              Información de contacto
+            </h2>
+
+            <ul class="space-y-3 text-gray-700 text-sm">
+              <li>
+                <strong>Email:</strong>
+                <a
+                  href="mailto:info@club.com"
+                  class="ml-2 hover:underline"
+                  style="color: var(--club-color)"
+                >
+                  info@club.com
+                </a>
+              </li>
+
+              <li>
+                <strong>Teléfono:</strong>
+                <span class="ml-2">
+                  600 000 000
+                </span>
+              </li>
+
+              <li>
+                <strong>Dirección:</strong>
+                <span class="ml-2">
+                  Campo Municipal · {club.name}
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Colaboraciones -->
+          <div class="bg-white border border-gray-200 rounded-lg p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">
+              Patrocinios y colaboraciones
+            </h2>
+
+            <p class="text-gray-600 text-sm mb-4">
+              Si estás interesado en colaborar o patrocinar al club,
+              puedes escribirnos y te informaremos sin compromiso.
+            </p>
+
+            <a
+              href="mailto:info@club.com?subject=Patrocinio%20Club"
+              class="inline-block px-5 py-2.5 rounded-md text-white text-sm font-medium"
+              style="background-color: var(--club-color)"
+            >
+              Contactar por email
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <ClubFooter
+        clubName={club.name}
+        slug={slug}
+      />
+    </>
+  )}
+</BaseLayout>

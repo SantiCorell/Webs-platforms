@@ -1,0 +1,91 @@
+---
+const { clubName, logoUrl, slug } = Astro.props;
+---
+
+<header class="sticky top-0 z-50 bg-white border-b border-gray-200">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="flex items-center justify-between h-16">
+
+      <!-- Logo + nombre -->
+      <div class="flex items-center gap-3">
+        <img
+          src={logoUrl}
+          alt={clubName}
+          class="h-10 w-10 rounded-full object-contain"
+        />
+        <span
+          class="font-semibold text-lg"
+          style="color: var(--club-color)"
+        >
+          {clubName}
+        </span>
+      </div>
+
+      <!-- Navegación desktop -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
+        <a href={`/club/${slug}`} class="hover:text-[var(--club-color)] transition">
+          Inicio
+        </a>
+        <a href={`/club/${slug}/noticias`} class="hover:text-[var(--club-color)] transition">
+          Noticias
+        </a>
+        <a href={`/club/${slug}/jornadas`} class="hover:text-[var(--club-color)] transition">
+          Jornadas
+        </a>
+        <a href={`/club/${slug}/equipos`} class="hover:text-[var(--club-color)] transition">
+          Equipos
+        </a>
+        <a href={`/club/${slug}/patrocinadores`} class="hover:text-[var(--club-color)] transition">
+          Patrocinadores
+        </a>
+        <a
+          href={`/club/${slug}/contacto`}
+          class="font-semibold transition"
+          style="color: var(--club-color)"
+        >
+          Contacto
+        </a>
+      </nav>
+
+      <!-- Botón hamburguesa (mobile) -->
+      <button
+        id="menu-toggle"
+        class="md:hidden text-gray-700 focus:outline-none"
+        aria-label="Abrir menú"
+      >
+        ☰
+      </button>
+    </div>
+  </div>
+
+  <!-- Menú mobile -->
+  <div
+    id="mobile-menu"
+    class="hidden md:hidden bg-white border-t border-gray-200"
+  >
+    <nav class="flex flex-col px-6 py-4 space-y-3 text-sm font-medium text-gray-700">
+      <a href={`/club/${slug}`} class="hover:text-[var(--club-color)]">Inicio</a>
+      <a href={`/club/${slug}/noticias`} class="hover:text-[var(--club-color)]">Noticias</a>
+      <a href={`/club/${slug}/jornadas`} class="hover:text-[var(--club-color)]">Jornadas</a>
+      <a href={`/club/${slug}/equipos`} class="hover:text-[var(--club-color)]">Equipos</a>
+      <a href={`/club/${slug}/patrocinadores`} class="hover:text-[var(--club-color)]">Patrocinadores</a>
+      <a
+        href={`/club/${slug}/contacto`}
+        class="font-semibold"
+        style="color: var(--club-color)"
+      >
+        Contacto
+      </a>
+    </nav>
+  </div>
+
+  <!-- JS mínimo -->
+  <script>
+    const toggle = document.getElementById("menu-toggle");
+    const menu = document.getElementById("mobile-menu");
+
+    toggle?.addEventListener("click", () => {
+      menu.classList.toggle("hidden");
+    });
+  </script>
+</header>

@@ -1,0 +1,756 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Gestión de Galería · Administración">
+  <div class="min-h-screen bg-neutral-50">
+
+    <!-- Cabecera de Navegación -->
+    <header class="bg-white shadow-sm border-b border-neutral-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <a 
+            href="/admin/dashboard" 
+            class="text-neutral-600 hover:text-neutral-900 transition-colors p-2 hover:bg-neutral-100 rounded-lg flex items-center space-x-2"
+            title="Volver al panel principal"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span class="hidden sm:inline text-sm font-medium">Panel Principal</span>
+          </a>
+          <div class="h-6 w-px bg-neutral-200"></div>
+          <div>
+            <h1 class="font-semibold text-neutral-900">Gestión de Galería</h1>
+            <p class="text-xs text-neutral-500">Organiza álbumes fotográficos del club</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+          <div class="hidden md:flex items-center space-x-3 text-sm">
+            <div class="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-neutral-600">Sesión Activa</span>
+          </div>
+          <button
+            id="logout"
+            class="px-4 py-2 text-sm font-medium text-neutral-700 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors duration-200 flex items-center space-x-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      <!-- Cabecera y Estadísticas -->
+      <div class="mb-10">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between lg:space-x-8">
+          <div class="flex-1">
+            <h2 class="text-2xl md:text-3xl font-bold text-neutral-900">Galería de Imágenes</h2>
+            <p class="text-neutral-600 mt-2 max-w-3xl">
+              Administra los álbumes fotográficos del club. Crea nuevas colecciones, organiza contenido visual y gestiona el archivo multimedia.
+            </p>
+          </div>
+          
+          <div class="mt-6 lg:mt-0 flex items-center space-x-4">
+            <div class="text-right">
+              <p class="text-sm text-neutral-500">Álbumes activos</p>
+              <p id="album-count" class="text-2xl font-bold text-neutral-900">--</p>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-neutral-500">Imágenes totales</p>
+              <p id="photo-count" class="text-2xl font-bold text-neutral-900">--</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel de Creación -->
+      <div class="mb-12">
+        <div class="bg-gradient-to-r from-blue-50 to-white border border-blue-100 rounded-xl shadow-sm overflow-hidden">
+          <div class="px-6 py-5 border-b border-blue-100">
+            <h3 class="text-lg font-semibold text-neutral-900 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Crear Nuevo Álbum
+            </h3>
+            <p class="text-sm text-neutral-600 mt-1">
+              Define una nueva colección fotográfica para organizar imágenes
+            </p>
+          </div>
+
+          <form id="album-form" class="p-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-neutral-900 mb-2">
+                  <span class="flex items-center">
+                    Título del álbum
+                    <span class="text-red-500 ml-1">*</span>
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">Nombre descriptivo para la colección</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  required
+                  maxlength="100"
+                  class="w-full rounded-lg border border-neutral-300 px-4 py-3
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                         transition-colors duration-200"
+                  placeholder="Ej: Torneo Regional 2024"
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-neutral-900 mb-2">
+                  <span class="flex items-center">
+                    Visibilidad
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">Controla quién puede ver este álbum</span>
+                </label>
+                <select
+                  name="visibility"
+                  class="w-full rounded-lg border border-neutral-300 px-4 py-3
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                         bg-white cursor-pointer"
+                >
+                  <option value="public">Público - Visible para todos</option>
+                  <option value="members">Sólo miembros</option>
+                  <option value="private">Privado - Sólo administradores</option>
+                </select>
+              </div>
+
+              <div class="lg:col-span-2">
+                <label class="block text-sm font-medium text-neutral-900 mb-2">
+                  <span class="flex items-center">
+                    Descripción
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">Información contextual sobre el contenido del álbum</span>
+                </label>
+                <textarea
+                  name="description"
+                  rows="3"
+                  maxlength="500"
+                  class="w-full rounded-lg border border-neutral-300 px-4 py-3
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                         transition-colors duration-200 resize-none"
+                  placeholder="Describe el contenido, fecha del evento, participantes..."
+                ></textarea>
+                <div class="text-right mt-1">
+                  <span id="char-count" class="text-xs text-neutral-400">0/500 caracteres</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6 pt-6 border-t border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center space-x-3">
+                <button
+                  type="submit"
+                  id="submit-btn"
+                  class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 
+                         transition-all duration-200 shadow-sm hover:shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                  Crear Álbum
+                </button>
+                
+                <button
+                  type="button"
+                  id="reset-btn"
+                  class="inline-flex items-center px-4 py-3 bg-white border border-neutral-300 text-neutral-700 
+                         font-medium rounded-lg hover:bg-neutral-50 transition-all duration-200"
+                >
+                  Limpiar Formulario
+                </button>
+              </div>
+
+              <div class="text-sm text-neutral-500">
+                <p class="flex items-center">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  Los álbumes se crean inmediatamente y pueden editarse después
+                </p>
+              </div>
+            </div>
+
+            <!-- Mensajes de Estado -->
+            <div id="form-messages" class="mt-4 space-y-2"></div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Listado de Álbumes -->
+      <div>
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-xl font-bold text-neutral-900">Álbumes del Club</h3>
+            <p class="text-neutral-600 mt-1">Gestiona y organiza todas las colecciones fotográficas</p>
+          </div>
+          
+          <div class="flex items-center space-x-3">
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Buscar álbum..."
+                class="pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+            </div>
+            
+            <select
+              id="sort-select"
+              class="px-4 py-2 border border-neutral-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white cursor-pointer"
+            >
+              <option value="newest">Más recientes primero</option>
+              <option value="oldest">Más antiguos primero</option>
+              <option value="title">Por título (A-Z)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Estados de Carga -->
+        <div id="loading-state" class="text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-4"></div>
+          <p class="text-neutral-600">Cargando álbumes...</p>
+        </div>
+
+        <!-- Estado Vacío -->
+        <div id="empty-state" class="hidden text-center py-16 bg-white rounded-xl border border-dashed border-neutral-300">
+          <svg class="w-20 h-20 text-neutral-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <h4 class="text-xl font-semibold text-neutral-900 mb-2">No hay álbumes creados</h4>
+          <p class="text-neutral-600 max-w-md mx-auto mb-8">
+            Comienza creando tu primer álbum para organizar las fotografías del club.
+          </p>
+          <button
+            onclick="document.getElementById('album-form').scrollIntoView({ behavior: 'smooth' })"
+            class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-all duration-200"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Crear Primer Álbum
+          </button>
+        </div>
+
+        <!-- Grid de Álbumes -->
+        <div id="album-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+        <!-- Paginación -->
+        <div id="pagination" class="hidden mt-8 flex items-center justify-between">
+          <div class="text-sm text-neutral-600">
+            Mostrando <span id="page-start">1</span>-<span id="page-end">6</span> de <span id="total-items">0</span> álbumes
+          </div>
+          <div class="flex space-x-2">
+            <button id="prev-page" class="px-4 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              Anterior
+            </button>
+            <button id="next-page" class="px-4 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              Siguiente
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { supabase } from "../../../lib/supabaseClient";
+
+    // Estado global
+    let currentAlbums = [];
+    let currentPage = 1;
+    const itemsPerPage = 6;
+    let totalAlbums = 0;
+    let totalPhotos = 0;
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Verificar sesión y permisos
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        window.location.href = "/admin?error=session_expired";
+        return;
+      }
+
+      const user = sessionData.session.user;
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, club_id, full_name")
+        .eq("id", user.id)
+        .single();
+
+      if (!profile || !["admin", "fotos", "editor"].includes(profile.role)) {
+        showGlobalError("No tienes permisos suficientes para acceder a esta área");
+        setTimeout(() => window.location.href = "/admin/dashboard", 2000);
+        return;
+      }
+
+      // Cargar estadísticas
+      await loadStatistics(profile.club_id);
+      
+      // Cargar álbumes
+      await loadAlbums(profile.club_id);
+
+      // Configurar formulario
+      setupForm(profile);
+
+      // Configurar búsqueda y filtros
+      setupFilters();
+
+      // Logout
+      document.getElementById('logout').addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        window.location.href = "/admin";
+      });
+    });
+
+    // Funciones principales
+    async function loadStatistics(clubId) {
+      try {
+        // Contar álbumes
+        const { count: albumCount } = await supabase
+          .from('albums')
+          .select('*', { count: 'exact', head: true })
+          .eq('club_id', clubId);
+
+        // Contar fotos
+        const { count: photoCount } = await supabase
+          .from('photos')
+          .select('*', { count: 'exact', head: true })
+          .eq('club_id', clubId);
+
+        document.getElementById('album-count').textContent = albumCount || 0;
+        document.getElementById('photo-count').textContent = photoCount || 0;
+        totalAlbums = albumCount || 0;
+        totalPhotos = photoCount || 0;
+      } catch (error) {
+        console.error('Error cargando estadísticas:', error);
+      }
+    }
+
+    async function loadAlbums(clubId) {
+      const loadingEl = document.getElementById('loading-state');
+      const emptyEl = document.getElementById('empty-state');
+      const gridEl = document.getElementById('album-grid');
+      const paginationEl = document.getElementById('pagination');
+
+      try {
+        const { data: albums, error } = await supabase
+          .from('albums')
+          .select(`
+            *,
+            photos ( count )
+          `)
+          .eq('club_id', clubId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        currentAlbums = albums || [];
+        
+        loadingEl.classList.add('hidden');
+        
+        if (currentAlbums.length === 0) {
+          emptyEl.classList.remove('hidden');
+          gridEl.classList.add('hidden');
+          paginationEl.classList.add('hidden');
+          return;
+        }
+
+        emptyEl.classList.add('hidden');
+        gridEl.classList.remove('hidden');
+        renderAlbums(currentAlbums);
+        
+        if (currentAlbums.length > itemsPerPage) {
+          paginationEl.classList.remove('hidden');
+          updatePagination();
+        } else {
+          paginationEl.classList.add('hidden');
+        }
+
+      } catch (error) {
+        console.error('Error cargando álbumes:', error);
+        loadingEl.classList.add('hidden');
+        showGlobalError('Error al cargar los álbumes. Intenta recargar la página.');
+      }
+    }
+
+    function renderAlbums(albums) {
+      const gridEl = document.getElementById('album-grid');
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedAlbums = albums.slice(startIndex, endIndex);
+
+      gridEl.innerHTML = '';
+
+      paginatedAlbums.forEach(album => {
+        const photoCount = album.photos?.[0]?.count || 0;
+        const createdDate = new Date(album.created_at);
+        const formattedDate = createdDate.toLocaleDateString('es-ES', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        });
+
+        const visibilityBadge = {
+          'public': { color: 'bg-green-100 text-green-800', label: 'Público' },
+          'members': { color: 'bg-blue-100 text-blue-800', label: 'Miembros' },
+          'private': { color: 'bg-neutral-100 text-neutral-800', label: 'Privado' }
+        }[album.visibility || 'public'];
+
+        const card = document.createElement('div');
+        card.className = 'group bg-white rounded-xl border border-neutral-200 hover:shadow-lg transition-all duration-300 overflow-hidden';
+        card.innerHTML = `
+          <div class="p-5">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1 min-w-0">
+                <h4 class="font-semibold text-neutral-900 text-lg truncate group-hover:text-blue-600 transition-colors">
+                  ${escapeHtml(album.title)}
+                </h4>
+                <div class="flex items-center space-x-2 mt-1">
+                  <span class="text-xs px-2 py-1 rounded-full ${visibilityBadge.color}">
+                    ${visibilityBadge.label}
+                  </span>
+                  <span class="text-xs text-neutral-500">${formattedDate}</span>
+                </div>
+              </div>
+              <div class="flex flex-col items-end space-y-1">
+                <div class="text-right">
+                  <span class="text-2xl font-bold text-neutral-900">${photoCount}</span>
+                  <span class="text-xs text-neutral-500 block">imágenes</span>
+                </div>
+              </div>
+            </div>
+
+            <p class="text-sm text-neutral-600 line-clamp-2 mb-4">
+              ${album.description ? escapeHtml(album.description) : 'Sin descripción'}
+            </p>
+
+            <div class="flex items-center justify-between pt-4 border-t border-neutral-100">
+              <div class="flex items-center space-x-3">
+                <a
+                  href="/admin/galeria/${album.id}"
+                  class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  Ver Álbum
+                </a>
+                
+                <button
+                  data-album-id="${album.id}"
+                  class="inline-flex items-center px-3 py-2 bg-white border border-neutral-300 text-neutral-700 text-sm font-medium rounded-lg hover:bg-neutral-50 transition-colors delete-album-btn"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+              
+              <div class="text-right">
+                <span class="text-xs text-neutral-400">ID: ${album.id}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        gridEl.appendChild(card);
+      });
+
+      // Agregar eventos a botones de eliminar
+      document.querySelectorAll('.delete-album-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const albumId = e.currentTarget.getAttribute('data-album-id');
+          deleteAlbum(albumId);
+        });
+      });
+    }
+
+    function setupForm(profile) {
+      const form = document.getElementById('album-form');
+      const descriptionTextarea = form.querySelector('textarea[name="description"]');
+      const charCount = document.getElementById('char-count');
+      const submitBtn = document.getElementById('submit-btn');
+      const resetBtn = document.getElementById('reset-btn');
+      const messagesContainer = document.getElementById('form-messages');
+
+      // Contador de caracteres
+      descriptionTextarea.addEventListener('input', (e) => {
+        const length = e.target.value.length;
+        charCount.textContent = `${length}/500 caracteres`;
+        charCount.className = length === 500 ? 
+          'text-xs text-red-500' : 
+          'text-xs text-neutral-400';
+      });
+
+      // Reset
+      resetBtn.addEventListener('click', () => {
+        form.reset();
+        charCount.textContent = '0/500 caracteres';
+        charCount.className = 'text-xs text-neutral-400';
+        clearMessages();
+      });
+
+      // Submit
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        clearMessages();
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+          Creando...
+        `;
+
+        const formData = new FormData(form);
+        const title = formData.get('title').trim();
+        const description = formData.get('description').trim();
+        const visibility = formData.get('visibility');
+
+        if (!title) {
+          showMessage('error', 'El título del álbum es obligatorio');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Crear Álbum
+          `;
+          return;
+        }
+
+        try {
+          const payload = {
+            club_id: profile.club_id,
+            title,
+            description: description || null,
+            visibility,
+            created_by: profile.full_name || profile.email
+          };
+
+          const { error } = await supabase
+            .from('albums')
+            .insert(payload);
+
+          if (error) throw error;
+
+          showMessage('success', 'Álbum creado exitosamente');
+          
+          // Reset y recargar
+          form.reset();
+          charCount.textContent = '0/500 caracteres';
+          charCount.className = 'text-xs text-neutral-400';
+          
+          // Recargar datos
+          setTimeout(async () => {
+            await loadStatistics(profile.club_id);
+            await loadAlbums(profile.club_id);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Crear Álbum
+            `;
+          }, 1500);
+
+        } catch (error) {
+          console.error('Error creando álbum:', error);
+          showMessage('error', `Error al crear el álbum: ${error.message}`);
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            Crear Álbum
+          `;
+        }
+      });
+
+      function showMessage(type, text) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `p-3 rounded-lg border ${
+          type === 'error' 
+            ? 'bg-red-50 border-red-200 text-red-700' 
+            : 'bg-green-50 border-green-200 text-green-700'
+        }`;
+        messageDiv.innerHTML = `
+          <div class="flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              ${
+                type === 'error'
+                  ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                  : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+              }
+            </svg>
+            <span class="text-sm">${text}</span>
+          </div>
+        `;
+        messagesContainer.appendChild(messageDiv);
+        
+        if (type === 'success') {
+          setTimeout(() => messageDiv.remove(), 5000);
+        }
+      }
+
+      function clearMessages() {
+        messagesContainer.innerHTML = '';
+      }
+    }
+
+    function setupFilters() {
+      const searchInput = document.getElementById('search-input');
+      const sortSelect = document.getElementById('sort-select');
+      const prevBtn = document.getElementById('prev-page');
+      const nextBtn = document.getElementById('next-page');
+
+      // Búsqueda
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          filterAlbums(e.target.value, sortSelect.value);
+        }, 300);
+      });
+
+      // Orden
+      sortSelect.addEventListener('change', (e) => {
+        filterAlbums(searchInput.value, e.target.value);
+      });
+
+      // Paginación
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderAlbums(currentAlbums);
+          updatePagination();
+        }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        const totalPages = Math.ceil(currentAlbums.length / itemsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderAlbums(currentAlbums);
+          updatePagination();
+        }
+      });
+    }
+
+    function filterAlbums(searchTerm, sortOrder) {
+      let filtered = [...currentAlbums];
+      
+      // Filtrar por búsqueda
+      if (searchTerm) {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(album => 
+          album.title.toLowerCase().includes(term) || 
+          (album.description && album.description.toLowerCase().includes(term))
+        );
+      }
+      
+      // Ordenar
+      switch (sortOrder) {
+        case 'oldest':
+          filtered.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+          break;
+        case 'title':
+          filtered.sort((a, b) => a.title.localeCompare(b.title));
+          break;
+        case 'newest':
+        default:
+          filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+          break;
+      }
+      
+      currentAlbums = filtered;
+      currentPage = 1;
+      renderAlbums(currentAlbums);
+      updatePagination();
+    }
+
+    function updatePagination() {
+      const totalItems = currentAlbums.length;
+      const totalPages = Math.ceil(totalItems / itemsPerPage);
+      const startIndex = (currentPage - 1) * itemsPerPage + 1;
+      const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+      
+      document.getElementById('page-start').textContent = startIndex;
+      document.getElementById('page-end').textContent = endIndex;
+      document.getElementById('total-items').textContent = totalItems;
+      
+      document.getElementById('prev-page').disabled = currentPage === 1;
+      document.getElementById('next-page').disabled = currentPage === totalPages || totalPages === 0;
+    }
+
+    async function deleteAlbum(albumId) {
+      if (!confirm('¿Estás seguro de que deseas eliminar este álbum?\nEsta acción eliminará todas las fotos contenidas y no se puede deshacer.')) {
+        return;
+      }
+
+      try {
+        const { error } = await supabase
+          .from('albums')
+          .delete()
+          .eq('id', albumId);
+
+        if (error) throw error;
+
+        // Recargar datos
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("club_id")
+          .eq("id", (await supabase.auth.getSession()).data.session.user.id)
+          .single();
+
+        await loadStatistics(profile.club_id);
+        await loadAlbums(profile.club_id);
+
+      } catch (error) {
+        console.error('Error eliminando álbum:', error);
+        showGlobalError('Error al eliminar el álbum. Intenta nuevamente.');
+      }
+    }
+
+    // Funciones utilitarias
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function showGlobalError(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'fixed top-4 right-4 z-50 max-w-md';
+      errorDiv.innerHTML = `
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg shadow-lg">
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="text-sm text-red-700">${message}</span>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(errorDiv);
+      setTimeout(() => errorDiv.remove(), 5000);
+    }
+  </script>
+</BaseLayout>

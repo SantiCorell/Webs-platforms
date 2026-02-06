@@ -1,0 +1,58 @@
+---
+const { clubName, slug } = Astro.props;
+---
+
+<footer class="bg-white border-t border-gray-200">
+  <div class="max-w-7xl mx-auto px-6 py-12">
+
+    <div class="grid gap-8 md:grid-cols-3">
+
+      <!-- Club -->
+      <div>
+        <h3
+          class="text-sm font-semibold uppercase tracking-wide mb-4"
+          style="color: var(--club-color)"
+        >
+          {clubName}
+        </h3>
+
+        <p class="text-sm text-gray-600">
+          Web oficial del {clubName}.  
+          Información institucional, deportiva y de contacto del club.
+        </p>
+      </div>
+
+      <!-- Enlaces -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-900 mb-4">
+          Club
+        </h3>
+
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li><a href={`/club/${slug}`} class="hover:underline">Inicio</a></li>
+          <li><a href={`/club/${slug}/noticias`} class="hover:underline">Noticias</a></li>
+          <li><a href={`/club/${slug}/patrocinadores`} class="hover:underline">Patrocinadores</a></li>
+          <li><a href={`/club/${slug}/contacto`} class="hover:underline">Contacto</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal / RRSS -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wide text-gray-900 mb-4">
+          Información
+        </h3>
+
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li>Términos y condiciones</li>
+          <li>Política de privacidad</li>
+          <li class="pt-2">
+            <span class="block text-gray-500">
+              © {new Date().getFullYear()} {clubName}
+            </span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,1386 @@
+---
+import BaseLayout from "../../../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Crear Noticia · Administración">
+  <div class="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-blue-50/30">
+
+    <!-- Cabecera de Navegación -->
+    <header class="bg-white/95 backdrop-blur-sm shadow-lg border-b border-neutral-200/80 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <a 
+            href="/admin/noticias" 
+            class="text-neutral-600 hover:text-neutral-900 transition-all duration-300 p-2 hover:bg-neutral-100 rounded-xl group"
+            title="Volver al listado"
+          >
+            <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+          </a>
+          <div class="h-6 w-px bg-gradient-to-b from-transparent via-neutral-300 to-transparent"></div>
+          <div class="flex items-center space-x-3">
+            <div class="p-2.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-lg">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="font-semibold text-neutral-900">Crear Nueva Noticia</h1>
+              <p class="text-xs text-neutral-500">Publica contenido oficial del club</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-6">
+          <div class="hidden md:flex items-center space-x-3 text-sm bg-gradient-to-r from-green-50 to-emerald-50 px-3 py-1.5 rounded-full border border-green-100">
+            <div class="h-2 w-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-pulse"></div>
+            <span class="text-green-700 font-medium">Modo Creación</span>
+          </div>
+          
+          <button
+            id="logout"
+            class="px-4 py-2.5 text-sm font-medium text-neutral-700 hover:text-red-700 hover:bg-red-50 rounded-xl transition-all duration-300 flex items-center space-x-2 group"
+          >
+            <svg class="w-4 h-4 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+            <span>Cerrar Sesión</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      
+      <!-- Cabecera del Creador -->
+      <div class="mb-10">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between lg:space-x-8">
+          <div class="flex-1">
+            <h2 class="text-3xl md:text-4xl font-bold text-neutral-900 mb-3 bg-gradient-to-r from-neutral-900 to-neutral-700 bg-clip-text text-transparent">
+              Crear Nueva Noticia
+            </h2>
+            <p class="text-neutral-600 max-w-3xl">
+              Completa todos los campos para publicar una nueva noticia. Los campos marcados con * son obligatorios.
+            </p>
+          </div>
+          
+          <div class="mt-6 lg:mt-0 flex items-center space-x-6">
+            <div class="text-right hidden md:block">
+              <p class="text-sm text-neutral-500">Guía de publicación</p>
+              <a 
+                href="#publishing-guide" 
+                class="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                Ver recomendaciones
+              </a>
+            </div>
+            <div class="text-right">
+              <p class="text-sm text-neutral-500">Tiempo estimado</p>
+              <p class="text-xl font-bold text-neutral-900">5 min</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor del Formulario -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Área de Creación Principal -->
+        <div class="lg:col-span-2">
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-xl shadow-neutral-200/30 overflow-hidden transition-all duration-500 hover:shadow-2xl hover:shadow-neutral-300/50">
+            <div class="px-8 py-6 border-b border-neutral-200 bg-gradient-to-r from-white to-neutral-50">
+              <div class="flex items-center justify-between">
+                <h3 class="text-xl font-bold text-neutral-900">Detalles de la Noticia</h3>
+                <div class="flex items-center space-x-2">
+                  <div id="form-status" class="text-xs text-emerald-600 font-medium px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-200">
+                    <span class="flex items-center">
+                      <svg class="w-3 h-3 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      Borrador
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <form id="news-form" class="p-8">
+              <!-- Título -->
+              <div class="mb-8">
+                <label class="block text-sm font-semibold text-neutral-900 mb-3">
+                  <span class="flex items-center">
+                    Título de la noticia
+                    <span class="text-red-500 ml-1">*</span>
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">Título atractivo y descriptivo (máx. 120 caracteres)</span>
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  required
+                  maxlength="120"
+                  class="w-full rounded-xl border-2 border-neutral-300 px-5 py-4 text-lg font-medium
+                         focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                         transition-all duration-300 hover:border-neutral-400"
+                  placeholder="Ej: El club gana el campeonato regional 2024"
+                  autofocus
+                />
+                <div class="flex justify-between mt-2">
+                  <span class="text-xs text-neutral-400">Aparecerá en el listado principal y redes sociales</span>
+                  <span id="title-counter" class="text-xs text-neutral-400">0/120</span>
+                </div>
+              </div>
+
+              <!-- Extracto -->
+              <div class="mb-8">
+                <label class="block text-sm font-semibold text-neutral-900 mb-3">
+                  <span class="flex items-center">
+                    Extracto o descripción corta
+                    <span class="text-amber-500 ml-1">*</span>
+                  </span>
+                  <span class="text-xs text-neutral-500 font-normal">Breve resumen que aparecerá en tarjetas y redes sociales</span>
+                </label>
+                <textarea
+                  name="excerpt"
+                  rows="3"
+                  maxlength="300"
+                  required
+                  class="w-full rounded-xl border-2 border-neutral-300 px-5 py-4
+                         focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                         transition-all duration-300 hover:border-neutral-400 resize-none"
+                  placeholder="Describe brevemente el contenido de la noticia (mín. 50 caracteres)..."
+                ></textarea>
+                <div class="flex justify-between mt-2">
+                  <span class="text-xs text-neutral-400">Fundamental para SEO y compartir en redes</span>
+                  <span id="excerpt-counter" class="text-xs text-neutral-400">0/300</span>
+                </div>
+              </div>
+
+              <!-- Contenido Principal -->
+              <div class="mb-8">
+                <div class="flex items-center justify-between mb-3">
+                  <label class="block text-sm font-semibold text-neutral-900">
+                    <span class="flex items-center">
+                      Contenido de la noticia
+                      <span class="text-red-500 ml-1">*</span>
+                    </span>
+                    <span class="text-xs text-neutral-500 font-normal">Cuerpo completo del artículo</span>
+                  </label>
+                  <div class="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      id="format-bold"
+                      class="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                      title="Negrita (Ctrl+B)"
+                    >
+                      <span class="font-bold">B</span>
+                    </button>
+                    <button
+                      type="button"
+                      id="format-italic"
+                      class="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                      title="Cursiva (Ctrl+I)"
+                    >
+                      <span class="italic">I</span>
+                    </button>
+                    <button
+                      type="button"
+                      id="format-link"
+                      class="p-2 text-neutral-500 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors"
+                      title="Insertar enlace (Ctrl+K)"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <textarea
+                  name="content"
+                  rows="12"
+                  required
+                  class="w-full rounded-xl border-2 border-neutral-300 px-5 py-4 font-sans
+                         focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                         transition-all duration-300 hover:border-neutral-400 resize-y min-h-[300px]"
+                  placeholder="Escribe el contenido completo de la noticia aquí. Puedes usar formato básico como **negrita** o *cursiva*..."
+                ></textarea>
+                <div class="flex justify-between mt-2">
+                  <span class="text-xs text-neutral-400">Soporta formato Markdown básico</span>
+                  <span id="content-counter" class="text-xs text-neutral-400">0 caracteres</span>
+                </div>
+              </div>
+
+              <!-- Imagen Destacada -->
+              <div class="mb-10">
+                <div class="flex items-center justify-between mb-3">
+                  <label class="block text-sm font-semibold text-neutral-900">
+                    <span class="flex items-center">
+                      Imagen destacada
+                    </span>
+                    <span class="text-xs text-neutral-500 font-normal">Imagen principal de la noticia (recomendado)</span>
+                  </label>
+                  <button
+                    type="button"
+                    id="image-help"
+                    class="text-xs text-blue-600 hover:text-blue-800 flex items-center"
+                  >
+                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    Recomendaciones
+                  </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-4">
+                    <div>
+                      <input
+                        type="url"
+                        name="image_url"
+                        placeholder="https://ejemplo.com/imagen.jpg"
+                        class="w-full rounded-xl border-2 border-neutral-300 px-5 py-3.5
+                               focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500
+                               transition-all duration-300 hover:border-neutral-400"
+                      />
+                      <p class="text-xs text-neutral-400 mt-2">
+                        URL completa de la imagen (JPG, PNG, WebP)
+                      </p>
+                    </div>
+                    
+                    <button
+                      type="button"
+                      id="upload-image-btn"
+                      class="w-full inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-neutral-100 to-neutral-200 text-neutral-700 font-medium rounded-xl hover:from-white hover:to-neutral-300 transition-all duration-300 shadow-sm hover:shadow border border-neutral-300"
+                    >
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                      </svg>
+                      Subir desde dispositivo
+                    </button>
+                  </div>
+                  
+                  <div class="border-2 border-dashed border-neutral-300 rounded-xl p-6 text-center">
+                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-xl flex items-center justify-center">
+                      <svg class="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                    </div>
+                    <p class="text-sm text-neutral-600 mb-2">Vista previa de imagen</p>
+                    <p class="text-xs text-neutral-500">La imagen aparecerá aquí</p>
+                  </div>
+                </div>
+                
+                <div id="image-preview-container" class="mt-4 hidden">
+                  <div id="image-preview" class="max-w-md mx-auto rounded-xl overflow-hidden border border-neutral-300"></div>
+                  <p class="text-xs text-neutral-500 mt-2 text-center">Vista previa de la imagen seleccionada</p>
+                </div>
+                
+                <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50/50 rounded-xl border border-blue-200">
+                  <p class="text-sm font-medium text-blue-900 mb-2">📸 Recomendaciones para la imagen</p>
+                  <ul class="text-xs text-blue-800 space-y-1">
+                    <li class="flex items-start">
+                      <span class="mr-2">•</span>
+                      <span>Formato: JPG, PNG o WebP</span>
+                    </li>
+                    <li class="flex items-start">
+                      <span class="mr-2">•</span>
+                      <span>Relación de aspecto: 16:9 (recomendado)</span>
+                    </li>
+                    <li class="flex items-start">
+                      <span class="mr-2">•</span>
+                      <span>Tamaño mínimo: 1200x675px</span>
+                    </li>
+                    <li class="flex items-start">
+                      <span class="mr-2">•</span>
+                      <span>Peso máximo: 2MB</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Configuración de Publicación -->
+              <div class="mb-10" id="publishing-guide">
+                <div class="flex items-center justify-between mb-3">
+                  <label class="block text-sm font-semibold text-neutral-900">
+                    <span class="flex items-center">
+                      Configuración de publicación
+                    </span>
+                    <span class="text-xs text-neutral-500 font-normal">Controla cuándo y cómo se publica la noticia</span>
+                  </label>
+                </div>
+                
+                <div class="space-y-6">
+                  <!-- Publicación inmediata -->
+                  <div class="p-5 bg-gradient-to-r from-neutral-50 to-white rounded-xl border-2 border-neutral-300">
+                    <div class="flex items-start justify-between">
+                      <div class="flex-1">
+                        <div class="flex items-center mb-2">
+                          <div class="relative mr-3">
+                            <input
+                              type="radio"
+                              name="publish_option"
+                              id="publish_now"
+                              value="now"
+                              checked
+                              class="sr-only peer"
+                            />
+                            <label
+                              for="publish_now"
+                              class="relative w-5 h-5 bg-white border-2 border-neutral-300 rounded-full peer-checked:border-blue-500 cursor-pointer transition-colors"
+                            >
+                              <span class="absolute inset-1 bg-blue-500 rounded-full scale-0 peer-checked:scale-100 transition-transform"></span>
+                            </label>
+                          </div>
+                          <label for="publish_now" class="text-sm font-medium text-neutral-900 cursor-pointer">
+                            Publicar inmediatamente
+                          </label>
+                        </div>
+                        <p class="text-xs text-neutral-600 ml-8">
+                          La noticia será visible públicamente tan pronto como la guardes.
+                        </p>
+                      </div>
+                      <div class="px-3 py-1 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 text-xs font-semibold rounded-full border border-green-200">
+                        Recomendado
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Guardar como borrador -->
+                  <div class="p-5 bg-gradient-to-r from-neutral-50 to-white rounded-xl border-2 border-neutral-300">
+                    <div class="flex items-start">
+                      <div class="relative mr-3">
+                        <input
+                          type="radio"
+                          name="publish_option"
+                          id="publish_draft"
+                          value="draft"
+                          class="sr-only peer"
+                        />
+                        <label
+                          for="publish_draft"
+                          class="relative w-5 h-5 bg-white border-2 border-neutral-300 rounded-full peer-checked:border-blue-500 cursor-pointer transition-colors"
+                        >
+                          <span class="absolute inset-1 bg-blue-500 rounded-full scale-0 peer-checked:scale-100 transition-transform"></span>
+                        </label>
+                      </div>
+                      <div class="flex-1">
+                        <label for="publish_draft" class="text-sm font-medium text-neutral-900 cursor-pointer">
+                          Guardar como borrador
+                        </label>
+                        <p class="text-xs text-neutral-600 mt-1">
+                          La noticia se guardará pero no será visible públicamente hasta que decidas publicarla.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Programar publicación -->
+                  <div class="p-5 bg-gradient-to-r from-neutral-50 to-white rounded-xl border-2 border-neutral-300">
+                    <div class="flex items-start">
+                      <div class="relative mr-3">
+                        <input
+                          type="radio"
+                          name="publish_option"
+                          id="publish_schedule"
+                          value="schedule"
+                          class="sr-only peer"
+                        />
+                        <label
+                          for="publish_schedule"
+                          class="relative w-5 h-5 bg-white border-2 border-neutral-300 rounded-full peer-checked:border-blue-500 cursor-pointer transition-colors"
+                        >
+                          <span class="absolute inset-1 bg-blue-500 rounded-full scale-0 peer-checked:scale-100 transition-transform"></span>
+                        </label>
+                      </div>
+                      <div class="flex-1">
+                        <label for="publish_schedule" class="text-sm font-medium text-neutral-900 cursor-pointer">
+                          Programar publicación
+                        </label>
+                        <p class="text-xs text-neutral-600 mt-1">
+                          Programa la publicación para una fecha y hora específica.
+                        </p>
+                        <div id="schedule-fields" class="mt-3 space-y-3 hidden">
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                              <label class="block text-xs font-medium text-neutral-700 mb-1">
+                                Fecha de publicación
+                              </label>
+                              <input
+                                type="date"
+                                id="schedule_date"
+                                class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label class="block text-xs font-medium text-neutral-700 mb-1">
+                                Hora de publicación
+                              </label>
+                              <input
+                                type="time"
+                                id="schedule_time"
+                                class="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm"
+                              />
+                            </div>
+                          </div>
+                          <p class="text-xs text-neutral-500">
+                            La noticia se publicará automáticamente en la fecha y hora especificadas.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Controles Finales -->
+              <div class="pt-8 border-t border-neutral-200">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center space-x-2 text-sm text-neutral-500">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                      <span>Última vista previa: --</span>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <button
+                      type="button"
+                      id="preview-btn"
+                      class="inline-flex items-center px-6 py-3.5 bg-gradient-to-r from-neutral-100 to-neutral-200 text-neutral-700 font-medium rounded-xl hover:from-white hover:to-neutral-300 transition-all duration-300 shadow-sm hover:shadow border border-neutral-300"
+                    >
+                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                      </svg>
+                      Vista Previa
+                    </button>
+                    
+                    <button
+                      type="submit"
+                      id="submit-btn"
+                      class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/50 hover:scale-105"
+                    >
+                      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                      </svg>
+                      Crear Noticia
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mensajes de Estado -->
+              <div id="form-messages" class="mt-6 space-y-3"></div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Panel Lateral -->
+        <div class="space-y-8">
+          <!-- Guía Rápida -->
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-xl shadow-neutral-200/30 overflow-hidden">
+            <div class="px-6 py-5 border-b border-neutral-200 bg-gradient-to-r from-white to-neutral-50">
+              <h4 class="text-lg font-bold text-neutral-900">Guía Rápida</h4>
+            </div>
+            <div class="p-6">
+              <div class="space-y-5">
+                <div class="flex items-start space-x-3">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="text-sm font-semibold text-neutral-900">Título atractivo</h5>
+                    <p class="text-xs text-neutral-600 mt-1">Usa un título claro y descriptivo que capture la atención.</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start space-x-3">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="text-sm font-semibold text-neutral-900">Extracto clave</h5>
+                    <p class="text-xs text-neutral-600 mt-1">Resume lo más importante en 2-3 líneas para redes sociales.</p>
+                  </div>
+                </div>
+                
+                <div class="flex items-start space-x-3">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-100 to-yellow-100 flex items-center justify-center">
+                      <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <div>
+                    <h5 class="text-sm font-semibold text-neutral-900">Imagen de calidad</h5>
+                    <p class="text-xs text-neutral-600 mt-1">Una buena imagen aumenta el engagement en un 80%.</p>
+                  </div>
+                </div>
+                
+                <div class="pt-4 border-t border-neutral-200">
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Recomendaciones SEO</div>
+                  <ul class="text-xs text-neutral-600 space-y-1">
+                    <li class="flex items-start">
+                      <span class="mr-2">•</span>
+                      <span>Incluye palabras clave en el título</span>
+                    </li>
+                    <li class="flex items-start">
+                      <span class="mr-2">•</span>
+                      <span>Usa encabezados en el contenido</span>
+                    </li>
+                    <li class="flex items-start">
+                      <span class="mr-2">•</span>
+                      <span>Optimiza la imagen (nombre, alt text)</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Plantillas Rápidas -->
+          <div class="bg-gradient-to-br from-blue-50 to-indigo-50/50 rounded-2xl border border-blue-200/80 shadow-xl shadow-blue-200/30 p-6">
+            <h4 class="text-lg font-bold text-blue-900 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+              Plantillas Rápidas
+            </h4>
+            <div class="space-y-3">
+              <button
+                data-template="resultado"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-blue-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-green-700">Resultado Deportivo</div>
+                    <div class="text-xs text-neutral-500">Partido/torneo</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-green-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+              
+              <button
+                data-template="comunicado"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-blue-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-blue-700">Comunicado Oficial</div>
+                    <div class="text-xs text-neutral-500">Anuncio importante</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+              
+              <button
+                data-template="evento"
+                class="w-full flex items-center justify-between p-3 bg-white/80 hover:bg-white rounded-xl border border-blue-200 transition-all duration-300 hover:shadow-md group"
+              >
+                <div class="flex items-center">
+                  <div class="p-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg mr-3">
+                    <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                  </div>
+                  <div class="text-left">
+                    <div class="font-medium text-neutral-900 group-hover:text-purple-700">Próximo Evento</div>
+                    <div class="text-xs text-neutral-500">Convocatoria/evento</div>
+                  </div>
+                </div>
+                <svg class="w-5 h-5 text-neutral-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Estadísticas de Creación -->
+          <div class="bg-white rounded-2xl border border-neutral-200/80 shadow-xl shadow-neutral-200/30 overflow-hidden">
+            <div class="px-6 py-5 border-b border-neutral-200 bg-gradient-to-r from-white to-neutral-50">
+              <h4 class="text-lg font-bold text-neutral-900">Tu Actividad</h4>
+            </div>
+            <div class="p-6">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center space-x-3">
+                    <div class="p-2 bg-gradient-to-br from-neutral-100 to-neutral-200 rounded-lg">
+                      <svg class="w-4 h-4 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="text-sm font-medium text-neutral-900">Noticias creadas</div>
+                      <div class="text-xs text-neutral-500">Este mes</div>
+                    </div>
+                  </div>
+                  <div class="text-2xl font-bold text-blue-600" id="created-count">--</div>
+                </div>
+                
+                <div class="pt-4 border-t border-neutral-100">
+                  <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-3">Tendencias</div>
+                  <div class="space-y-2">
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Promedio de palabras:</span>
+                      <span class="font-medium text-neutral-900">450</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Tasa de lectura:</span>
+                      <span class="font-medium text-emerald-600">3 min</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                      <span class="text-neutral-600">Mejor hora:</span>
+                      <span class="font-medium text-blue-600">10:00 AM</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal de Confirmación -->
+  <div id="success-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Fondo -->
+      <div class="fixed inset-0 transition-opacity bg-neutral-900/70 backdrop-blur-sm"></div>
+
+      <!-- Modal -->
+      <div class="inline-block align-bottom bg-white rounded-2xl shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full overflow-hidden">
+        <div class="p-8">
+          <div class="flex items-center justify-center w-16 h-16 mx-auto bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl mb-6">
+            <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          
+          <div class="text-center">
+            <h3 class="text-2xl font-bold text-neutral-900 mb-3">¡Noticia Creada!</h3>
+            <p class="text-neutral-600 mb-6" id="success-message">
+              La noticia ha sido creada exitosamente y está lista para ser vista.
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+            <button
+              id="modal-view"
+              type="button"
+              class="flex-1 px-6 py-3.5 border-2 border-neutral-300 text-neutral-700 font-semibold rounded-xl hover:bg-neutral-50 transition-all duration-300 hover:border-neutral-400"
+            >
+              Ver Noticia
+            </button>
+            <button
+              id="modal-list"
+              type="button"
+              class="flex-1 px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40"
+            >
+              Ir al Listado
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { supabase } from "../../../../lib/supabaseClient";
+
+    // Estado global
+    let currentUser = null;
+    let currentProfile = null;
+    let formData = {
+      title: '',
+      excerpt: '',
+      content: '',
+      image_url: '',
+      publish_option: 'now'
+    };
+
+    // Inicialización
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Verificar sesión
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+          window.location.href = "/admin?error=session_expired";
+          return;
+        }
+
+        currentUser = sessionData.session.user;
+
+        // Verificar permisos
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("role, club_id, full_name, avatar_url")
+          .eq("id", currentUser.id)
+          .single();
+
+        if (profileError || !profile || !["admin", "cronica", "editor"].includes(profile.role)) {
+          showNotification('error', 'No tienes permisos para crear noticias');
+          setTimeout(() => window.location.href = "/admin/dashboard", 2000);
+          return;
+        }
+
+        currentProfile = profile;
+
+        // Configurar formulario
+        setupForm(currentProfile);
+
+        // Cargar estadísticas del usuario
+        await loadUserStats(currentProfile);
+
+        // Configurar logout
+        document.getElementById('logout').addEventListener('click', async () => {
+          const confirmExit = confirm('¿Estás seguro de querer salir? Los cambios no guardados se perderán.');
+          if (!confirmExit) return;
+          await supabase.auth.signOut();
+          window.location.href = "/admin";
+        });
+
+      } catch (error) {
+        console.error('Error de inicialización:', error);
+        showNotification('error', 'Error al cargar el creador de noticias');
+      }
+    });
+
+    function setupForm(profile) {
+      const form = document.getElementById('news-form');
+      const titleInput = form.querySelector('input[name="title"]');
+      const excerptInput = form.querySelector('textarea[name="excerpt"]');
+      const contentInput = form.querySelector('textarea[name="content"]');
+      const imageInput = form.querySelector('input[name="image_url"]');
+      const previewBtn = document.getElementById('preview-btn');
+      const submitBtn = document.getElementById('submit-btn');
+      const uploadImageBtn = document.getElementById('upload-image-btn');
+      const imageHelpBtn = document.getElementById('image-help');
+      const publishOptions = form.querySelectorAll('input[name="publish_option"]');
+      const scheduleFields = document.getElementById('schedule-fields');
+      const templateButtons = document.querySelectorAll('[data-template]');
+      const messagesContainer = document.getElementById('form-messages');
+
+      // Contadores de caracteres
+      titleInput.addEventListener('input', (e) => {
+        formData.title = e.target.value;
+        updateCounter('title-counter', e.target.value.length, 120);
+      });
+
+      excerptInput.addEventListener('input', (e) => {
+        formData.excerpt = e.target.value;
+        updateCounter('excerpt-counter', e.target.value.length, 300);
+      });
+
+      contentInput.addEventListener('input', (e) => {
+        formData.content = e.target.value;
+        updateCounter('content-counter', e.target.value.length);
+      });
+
+      imageInput.addEventListener('input', (e) => {
+        formData.image_url = e.target.value;
+        if (e.target.value) {
+          showImagePreview(e.target.value);
+        }
+      });
+
+      // Vista previa de imagen
+      function showImagePreview(url) {
+        const container = document.getElementById('image-preview-container');
+        const preview = document.getElementById('image-preview');
+        
+        preview.innerHTML = `
+          <div class="relative">
+            <img 
+              src="${url}" 
+              alt="Vista previa" 
+              class="w-full h-48 object-cover rounded-xl"
+              onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNGMEYyRjQiLz48cGF0aCBkPSJNMTIwIDE1MEgxODBNMTYwIDExMEgyMjBNMjAwIDE3MEgyNjBNMjQwIDEzMEgzMDAiIHN0cm9rZT0iI0QxRDREOCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48Y2lyY2xlIGN4PSIxNjAiIGN5PSIxMTAiIHI9IjMwIiBmaWxsPSIjRjBGMkY0IiBzdHJva2U9IiNEMUQ0RDgiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg=='"
+            />
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+              <p class="text-xs text-white truncate">${url}</p>
+            </div>
+          </div>
+        `;
+        
+        container.classList.remove('hidden');
+      }
+
+      // Botones de formato
+      document.getElementById('format-bold').addEventListener('click', () => {
+        insertTextAtCursor(contentInput, '**texto en negrita**');
+      });
+
+      document.getElementById('format-italic').addEventListener('click', () => {
+        insertTextAtCursor(contentInput, '*texto en cursiva*');
+      });
+
+      document.getElementById('format-link').addEventListener('click', () => {
+        const url = prompt('Ingresa la URL del enlace:');
+        if (url) {
+          const text = prompt('Ingresa el texto del enlace (opcional):', url);
+          insertTextAtCursor(contentInput, `[${text || url}](${url})`);
+        }
+      });
+
+      // Ayuda de imagen
+      imageHelpBtn.addEventListener('click', () => {
+        showNotification('info', 'Usa imágenes en formato JPG, PNG o WebP. Tamaño recomendado: 1200x675px');
+      });
+
+      // Subir imagen (placeholder)
+      uploadImageBtn.addEventListener('click', () => {
+        showNotification('info', 'Funcionalidad de subida de imágenes en desarrollo. Por ahora, usa una URL pública.');
+      });
+
+      // Opciones de publicación
+      publishOptions.forEach(option => {
+        option.addEventListener('change', (e) => {
+          formData.publish_option = e.target.value;
+          
+          if (e.target.value === 'schedule') {
+            scheduleFields.classList.remove('hidden');
+          } else {
+            scheduleFields.classList.add('hidden');
+          }
+          
+          // Actualizar texto del botón de envío
+          updateSubmitButtonText(e.target.value);
+        });
+      });
+
+      // Plantillas rápidas
+      templateButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          const template = button.getAttribute('data-template');
+          applyTemplate(template);
+        });
+      });
+
+      // Vista previa
+      previewBtn.addEventListener('click', () => {
+        // Validar datos mínimos para vista previa
+        if (!formData.title || !formData.content) {
+          showFormMessage('error', 'Completa al menos el título y contenido para ver la vista previa');
+          return;
+        }
+        
+        // Crear objeto de vista previa temporal
+        const previewData = {
+          ...formData,
+          id: 'preview',
+          created_at: new Date().toISOString(),
+          author: currentProfile.full_name || currentUser.email
+        };
+        
+        // Guardar en sessionStorage para vista previa
+        sessionStorage.setItem('news_preview', JSON.stringify(previewData));
+        
+        // Abrir en nueva pestaña
+        window.open('/noticias/preview', '_blank');
+      });
+
+      // Envío del formulario
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Limpiar mensajes anteriores
+        messagesContainer.innerHTML = '';
+        
+        // Validación
+        if (!validateForm()) {
+          return;
+        }
+        
+        // Preparar datos
+        const newsData = prepareNewsData(profile);
+        
+        // Deshabilitar botón y mostrar estado
+        const originalText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <div class="inline-block animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+          Creando noticia...
+        `;
+        
+        try {
+          // Insertar en Supabase
+          const { data, error } = await supabase
+            .from("news")
+            .insert(newsData)
+            .select()
+            .single();
+          
+          if (error) throw error;
+          
+          // Mostrar modal de éxito
+          showSuccessModal(data.id, formData.publish_option === 'now');
+          
+        } catch (error) {
+          console.error('Error creando noticia:', error);
+          showFormMessage('error', `Error al crear la noticia: ${error.message}`);
+          showNotification('error', 'Error al guardar la noticia');
+        } finally {
+          // Restaurar botón
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+        }
+      });
+
+      // Inicializar contadores
+      updateCounter('title-counter', titleInput.value.length, 120);
+      updateCounter('excerpt-counter', excerptInput.value.length, 300);
+      updateCounter('content-counter', contentInput.value.length);
+    }
+
+    function updateCounter(elementId, length, max = null) {
+      const element = document.getElementById(elementId);
+      if (max) {
+        element.textContent = `${length}/${max}`;
+        element.className = length > max * 0.9 ? 
+          'text-xs text-amber-600' : 
+          'text-xs text-neutral-400';
+      } else {
+        element.textContent = `${length.toLocaleString()} caracteres`;
+      }
+    }
+
+    function insertTextAtCursor(textarea, text) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selectedText = textarea.value.substring(start, end);
+      
+      const newText = text.replace('texto', selectedText || 'texto');
+      textarea.value = textarea.value.substring(0, start) + 
+                       newText + 
+                       textarea.value.substring(end);
+      
+      // Posicionar cursor después del texto insertado
+      const newCursorPos = start + newText.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.focus();
+      
+      // Actualizar estado
+      formData.content = textarea.value;
+      updateCounter('content-counter', textarea.value.length);
+      
+      // Disparar evento input
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function updateSubmitButtonText(option) {
+      const submitBtn = document.getElementById('submit-btn');
+      const icon = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>`;
+      
+      switch(option) {
+        case 'now':
+          submitBtn.innerHTML = `${icon}Publicar Noticia`;
+          break;
+        case 'draft':
+          submitBtn.innerHTML = `${icon}Guardar Borrador`;
+          break;
+        case 'schedule':
+          submitBtn.innerHTML = `${icon}Programar Noticia`;
+          break;
+      }
+    }
+
+    function applyTemplate(template) {
+      const templates = {
+        resultado: {
+          title: '[RESULTADO] Equipo del Club vs Rival - Torneo Actual',
+          excerpt: 'Resumen del encuentro deportivo con los momentos más destacados y el resultado final.',
+          content: `## 🏆 Resumen del Partido
+
+Nuestro equipo se enfrentó hoy a [Nombre del Rival] en un emocionante encuentro correspondiente a la [Nombre del Torneo].
+
+### ⚽ Primer Tiempo
+- Min 15': Primer gol del equipo, anotado por [Nombre del Jugador]
+- Min 32': Oportunidad clara de [Nombre del Jugador] que se estrella en el poste
+- Min 45': Empate del rival tras una jugada rápida
+
+### ⚽ Segundo Tiempo
+- Min 67': Gol de la victoria por parte de [Nombre del Jugador]
+- Min 89': Defensa espectacular de [Nombre del Jugador] salvando el empate
+
+### 📊 Estadísticas Finales
+- **Resultado:** Club X - X Rival
+- **Posesión:** 58% - 42%
+- **Tiros al arco:** 8 - 5
+- **Faltas:** 12 - 15
+
+### 👥 Alineación Destacada
+[Detalles de la alineación y jugadores destacados]
+
+### 🎯 Próximo Partido
+Nos preparamos para enfrentar a [Próximo Rival] el próximo [Fecha] en [Lugar].`
+        },
+        comunicado: {
+          title: 'COMUNICADO OFICIAL | Asunto Importante',
+          excerpt: 'Información oficial del club sobre decisiones importantes que afectan a la comunidad.',
+          content: `## 📢 Comunicado Oficial
+
+Estimados socios, jugadores y aficionados:
+
+### 🎯 Objetivo del Comunicado
+[Explicación clara del motivo del comunicado]
+
+### 📋 Puntos Principales
+1. **Primer punto importante**
+   - Detalle relevante
+   - Información adicional
+
+2. **Segundo punto importante**
+   - Detalle relevante
+   - Información adicional
+
+3. **Tercer punto importante**
+   - Detalle relevante
+   - Información adicional
+
+### 🗓️ Cronograma de Implementación
+- **Fecha X:** Inicio del proceso
+- **Fecha Y:** Etapa intermedia
+- **Fecha Z:** Implementación completa
+
+### ❓ Preguntas Frecuentes
+**¿Esto afecta a los socios actuales?**
+Respuesta clara y concisa.
+
+**¿Habrá cambios en las cuotas?**
+Respuesta clara y concisa.
+
+**¿Dónde puedo obtener más información?**
+Respuesta clara y concisa.
+
+### 📞 Contacto
+Para más información, contactar a:
+- Email: contacto@club.com
+- Teléfono: XXX-XXX-XXX
+- Oficinas: [Dirección]`
+        },
+        evento: {
+          title: '📅 PRÓXIMO EVENTO | Nombre del Evento',
+          excerpt: 'Invitación a participar en el próximo evento organizado por el club. Fecha, hora y lugar.',
+          content: `## 🎉 ¡Te Invitamos a Nuestro Próximo Evento!
+
+### 📍 Detalles del Evento
+- **Nombre:** [Nombre del Evento]
+- **Fecha:** [Fecha Completa]
+- **Hora:** [Hora de Inicio] - [Hora de Finalización]
+- **Lugar:** [Lugar del Evento]
+- **Dirigido a:** [Público Objetivo]
+
+### 🎯 Objetivo del Evento
+[Descripción del propósito y objetivos del evento]
+
+### 🎪 Actividades Programadas
+1. **Actividad Principal** (Hora)
+   - Descripción breve
+   
+2. **Talleres/Charlas** (Hora)
+   - Descripción breve
+   
+3. **Actividades Recreativas** (Hora)
+   - Descripción breve
+   
+4. **Premiaciones/Cierre** (Hora)
+   - Descripción breve
+
+### 🎟️ Inscripción y Costos
+- **Costo:** [Información sobre costos o gratuidad]
+- **Inscripción:** [Cómo inscribirse]
+- **Cupo:** [Límite de participantes si aplica]
+- **Fecha límite:** [Fecha límite de inscripción]
+
+### 🚗 Cómo Llegar
+[Instrucciones para llegar al lugar del evento]
+
+### 📋 Requisitos de Participación
+- [Requisito 1]
+- [Requisito 2]
+- [Requisito 3]
+
+### 🤝 Patrocinadores y Colaboradores
+[Agradecimientos y reconocimientos]
+
+### ❓ Más Información
+Para consultas, contactar a [Persona Responsable] al [Teléfono/Email]`
+        }
+      };
+
+      const selected = templates[template];
+      if (selected) {
+        const form = document.getElementById('news-form');
+        form.title.value = selected.title;
+        form.excerpt.value = selected.excerpt;
+        form.content.value = selected.content;
+        
+        // Actualizar contadores
+        updateCounter('title-counter', selected.title.length, 120);
+        updateCounter('excerpt-counter', selected.excerpt.length, 300);
+        updateCounter('content-counter', selected.content.length);
+        
+        // Actualizar estado
+        formData.title = selected.title;
+        formData.excerpt = selected.excerpt;
+        formData.content = selected.content;
+        
+        showNotification('success', `Plantilla "${template}" aplicada. Recuerda personalizar los datos.`);
+      }
+    }
+
+    function validateForm() {
+      const form = document.getElementById('news-form');
+      
+      // Validar título
+      if (!form.title.value.trim()) {
+        showFormMessage('error', 'El título es obligatorio');
+        form.title.focus();
+        return false;
+      }
+      
+      if (form.title.value.trim().length < 10) {
+        showFormMessage('error', 'El título debe tener al menos 10 caracteres');
+        form.title.focus();
+        return false;
+      }
+      
+      // Validar extracto
+      if (!form.excerpt.value.trim()) {
+        showFormMessage('error', 'El extracto es obligatorio');
+        form.excerpt.focus();
+        return false;
+      }
+      
+      if (form.excerpt.value.trim().length < 50) {
+        showFormMessage('error', 'El extracto debe tener al menos 50 caracteres');
+        form.excerpt.focus();
+        return false;
+      }
+      
+      // Validar contenido
+      if (!form.content.value.trim()) {
+        showFormMessage('error', 'El contenido es obligatorio');
+        form.content.focus();
+        return false;
+      }
+      
+      if (form.content.value.trim().length < 100) {
+        showFormMessage('error', 'El contenido debe tener al menos 100 caracteres');
+        form.content.focus();
+        return false;
+      }
+      
+      // Validar fecha programada si aplica
+      if (formData.publish_option === 'schedule') {
+        const date = document.getElementById('schedule_date').value;
+        const time = document.getElementById('schedule_time').value;
+        
+        if (!date || !time) {
+          showFormMessage('error', 'Debes especificar fecha y hora para la publicación programada');
+          return false;
+        }
+        
+        const scheduledDate = new Date(`${date}T${time}`);
+        const now = new Date();
+        
+        if (scheduledDate <= now) {
+          showFormMessage('error', 'La fecha programada debe ser futura');
+          return false;
+        }
+      }
+      
+      return true;
+    }
+
+    function prepareNewsData(profile) {
+      const form = document.getElementById('news-form');
+      const publishOption = formData.publish_option;
+      
+      const data = {
+        club_id: profile.club_id,
+        title: form.title.value.trim(),
+        excerpt: form.excerpt.value.trim(),
+        content: form.content.value.trim(),
+        image_url: form.image_url.value.trim() || null,
+        author_id: currentUser.id,
+        published: publishOption === 'now',
+        published_at: publishOption === 'now' ? new Date().toISOString() : null
+      };
+      
+      // Si es programada, calcular fecha de publicación
+      if (publishOption === 'schedule') {
+        const date = document.getElementById('schedule_date').value;
+        const time = document.getElementById('schedule_time').value;
+        data.published = false;
+        data.scheduled_at = `${date}T${time}`;
+      }
+      
+      return data;
+    }
+
+    async function loadUserStats(profile) {
+      try {
+        // Contar noticias creadas este mes
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        
+        const { count, error } = await supabase
+          .from('news')
+          .select('*', { count: 'exact', head: true })
+          .eq('club_id', profile.club_id)
+          .eq('author_id', currentUser.id)
+          .gte('created_at', startOfMonth.toISOString());
+        
+        if (!error) {
+          document.getElementById('created-count').textContent = count || 0;
+        }
+      } catch (error) {
+        console.error('Error cargando estadísticas:', error);
+      }
+    }
+
+    function showSuccessModal(newsId, isPublished) {
+      const modal = document.getElementById('success-modal');
+      const message = document.getElementById('success-message');
+      
+      if (isPublished) {
+        message.textContent = '¡La noticia ha sido publicada exitosamente y ya está disponible para todos los usuarios!';
+      } else {
+        message.textContent = '¡La noticia ha sido guardada como borrador exitosamente! Puedes publicarla cuando lo desees.';
+      }
+      
+      // Configurar botones del modal
+      document.getElementById('modal-view').onclick = () => {
+        window.open(`/noticias/${newsId}`, '_blank');
+        hideSuccessModal();
+        setTimeout(() => window.location.href = "/admin/noticias", 500);
+      };
+      
+      document.getElementById('modal-list').onclick = () => {
+        hideSuccessModal();
+        window.location.href = "/admin/noticias";
+      };
+      
+      // Mostrar modal
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function hideSuccessModal() {
+      document.getElementById('success-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function showFormMessage(type, text) {
+      const messagesContainer = document.getElementById('form-messages');
+      const messageDiv = document.createElement('div');
+      
+      const colors = {
+        success: { bg: 'bg-gradient-to-r from-green-50 to-emerald-50', border: 'border-green-200', text: 'text-green-800' },
+        error: { bg: 'bg-gradient-to-r from-red-50 to-pink-50', border: 'border-red-200', text: 'text-red-800' },
+        info: { bg: 'bg-gradient-to-r from-blue-50 to-indigo-50', border: 'border-blue-200', text: 'text-blue-800' }
+      };
+      
+      messageDiv.className = `p-4 rounded-xl border ${colors[type].bg} ${colors[type].border} ${colors[type].text}`;
+      messageDiv.innerHTML = `
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            ${
+              type === 'success' 
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                : type === 'error'
+                ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M9 21a9 9 0 1118 0 9 9 0 01-18 0z"/>'
+                : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+            }
+          </svg>
+          <span class="font-medium">${text}</span>
+        </div>
+      `;
+      
+      messagesContainer.appendChild(messageDiv);
+      
+      if (type === 'success') {
+        setTimeout(() => messageDiv.remove(), 5000);
+      }
+    }
+
+    function showNotification(type, message, duration = 5000) {
+      const notification = document.createElement('div');
+      const colors = {
+        success: { bg: 'from-green-500 to-emerald-500', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+        error: { bg: 'from-red-500 to-pink-500', icon: 'M12 9v2m0 4h.01M9 21a9 9 0 1118 0 9 9 0 01-18 0z' },
+        info: { bg: 'from-blue-500 to-indigo-500', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+        warning: { bg: 'from-amber-500 to-yellow-500', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.856-.833-2.624 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5' }
+      };
+      
+      notification.className = `fixed top-6 right-6 z-50 max-w-md transform transition-all duration-500 translate-x-full`;
+      notification.innerHTML = `
+        <div class="bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden">
+          <div class="flex items-start p-4">
+            <div class="flex-shrink-0">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r ${colors[type].bg} flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${colors[type].icon}"/>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-4 flex-1">
+              <p class="text-sm font-medium text-neutral-900">${message}</p>
+            </div>
+            <button class="ml-4 flex-shrink-0 text-neutral-400 hover:text-neutral-600 transition-colors" onclick="this.parentElement.parentElement.parentElement.remove()">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          <div class="h-1 w-full bg-gradient-to-r ${colors[type].bg}"></div>
+        </div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      // Animar entrada
+      requestAnimationFrame(() => {
+        notification.classList.remove('translate-x-full');
+      });
+      
+      // Auto-eliminar
+      setTimeout(() => {
+        notification.classList.add('translate-x-full');
+        setTimeout(() => notification.remove(), 500);
+      }, duration);
+    }
+  </script>
+</BaseLayout>

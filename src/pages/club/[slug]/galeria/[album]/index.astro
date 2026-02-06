@@ -1,0 +1,95 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../../../../layouts/BaseLayout.astro";
+import ClubHeader from "../../../../../components/ClubHeader.astro";
+import { supabase } from "../../../../../lib/supabaseClient";
+
+const { slug, album } = Astro.params;
+
+// Obtener club por slug
+const { data: club } = await supabase
+  .from("clubs")
+  .select("*")
+  .eq("slug", slug)
+  .single();
+
+// Obtener álbum
+const { data: albumData } = await supabase
+  .from("albums")
+  .select("*")
+  .eq("id", album)
+  .single();
+
+// Obtener fotos
+const { data: photos } = await supabase
+  .from("photos")
+  .select("*")
+  .eq("album_id", album)
+  .order("created_at", { ascending: false });
+
+// Mezclar para slider
+const shuffled = photos ? [...photos].sort(() => 0.5 - Math.random()) : [];
+const sliderPhotos = shuffled.slice(0, 5);
+---
+
+<BaseLayout title={`${albumData?.title ?? "Galería"} · ${club?.name ?? "Club"}`}>
+  {club && (
+    <>
+      <ClubHeader clubName={club.name} slug={slug} logoUrl={club.logo_url} />
+
+      <!-- CABECERA -->
+      <section class="bg-white border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 py-10">
+          <h1 class="text-3xl font-bold text-gray-900">
+            {albumData?.title}
+          </h1>
+          {albumData?.description && (
+            <p class="mt-3 max-w-3xl text-gray-600">
+              {albumData.description}
+            </p>
+          )}
+        </div>
+      </section>
+
+      <!-- SLIDER -->
+      {sliderPhotos.length > 0 && (
+        <section class="bg-gray-900">
+          <div class="max-w-7xl mx-auto px-6 py-6">
+            <div class="flex gap-4 overflow-x-auto snap-x snap-mandatory">
+              {sliderPhotos.map(photo => (
+                <img
+                  src={photo.image_url}
+                  alt="Foto del partido"
+                  class="h-64 w-auto object-cover rounded-lg snap-center"
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <!-- GRID -->
+      <section class="bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+          {photos && photos.length > 0 ? (
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {photos.map(photo => (
+                <img
+                  src={photo.image_url}
+                  alt="Foto del partido"
+                  class="w-full aspect-square object-cover rounded-md border border-gray-200"
+                  loading="lazy"
+                />
+              ))}
+            </div>
+          ) : (
+            <p class="text-sm text-gray-500">
+              No hay fotos en este álbum todavía.
+            </p>
+          )}
+        </div>
+      </section>
+    </>
+  )}
+</BaseLayout>
