@@ -4,16 +4,19 @@
   "version": "0.0.1",
   "description": "Plataforma web para clubs deportivos - Metrio",
   "scripts": {
+    "admin": "npm run dev --prefix admin",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "cron:ffcv": "curl -s -H \"x-cron-secret: $CRON_SECRET\" ${PUBLIC_SITE_URL:-http://localhost:4321}/api/cron/ffcv-refresh"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.2",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.94.0",
-    "astro": "^5.17.1"
+    "astro": "^5.17.1",
+    "cheerio": "^1.2.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.24",

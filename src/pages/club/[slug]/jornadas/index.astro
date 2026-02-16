@@ -3,54 +3,267 @@ export const prerender = false;
 
 import BaseLayout from "../../../../layouts/BaseLayout.astro";
 import ClubHeader from "../../../../components/ClubHeader.astro";
+import ClubFooter from "../../../../components/ClubFooter.astro";
+import { clubs } from "../../../../data/clubs";
+import { getSupabaseServer } from "../../../../lib/supabaseServer";
+import { getSupabaseService } from "../../../../lib/supabaseService";
 
 const { slug } = Astro.params;
+const staticClub = clubs[slug];
 
-const clubName = slug
-  .split("-")
-  .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-  .join(" ");
+const supabaseAnon = getSupabaseServer(Astro.cookies);
+const supabaseAdmin = getSupabaseService();
+const sb = supabaseAdmin ?? supabaseAnon;
 
-// MOCK de jornadas
-const matchdays = [
-  {
-    name: "Jornada 1",
-    matches: [
-      { team: "Infantil A", rival: "CD Torrent", result: "2 - 1" },
-      { team: "Cadete B", rival: "Valencia CF", result: null },
-    ],
-  },
-  {
-    name: "Jornada 2",
-    matches: [
-      { team: "Infantil A", rival: "Levante UD", result: "1 - 1" },
-    ],
-  },
-];
+let dbClub = (await sb.from("clubs").select("id, name, logo_url, color, page_visibility").eq("slug", slug).maybeSingle()).data ?? null;
+if (!dbClub && staticClub?.supabaseId) {
+  dbClub = (await sb.from("clubs").select("id, name, logo_url, color, page_visibility").eq("id", staticClub.supabaseId).maybeSingle()).data ?? null;
+}
+if (!dbClub) {
+  const r = await supabaseAnon.from("clubs").select("id, name, logo_url, color, page_visibility").eq("slug", slug).maybeSingle();
+  dbClub = r.data ?? null;
+}
+
+const defaultVisibility: Record<string, boolean> = { saludo: true, contacto: true, galeria: true, valores: true, patrocinadores: true, historia: true, equipos: true, jornadas: true, noticias: true };
+const pageVisibility = (dbClub?.page_visibility as Record<string, boolean> | null) ?? defaultVisibility;
+
+const club = {
+  name: dbClub?.name ?? staticClub?.name ?? slug.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+  logo: dbClub?.logo_url || staticClub?.logo || "/favicon.svg",
+  color: dbClub?.color ?? staticClub?.color ?? "#1f2937",
+};
+
+type MatchItem = { date?: string; time?: string; local: string; visitor: string; local_logo?: string; visitor_logo?: string; competition?: string; result?: string; stadium?: string };
+let nextMatches: MatchItem[] = [];
+if (dbClub?.id) {
+  let cacheRow = (await sb.from("club_ffcv_cache").select("next_matches").eq("club_id", dbClub.id).maybeSingle()).data;
+  if (!cacheRow?.next_matches) {
+    const other = sb === supabaseAdmin ? supabaseAnon : supabaseAdmin;
+    if (other) {
+      cacheRow = (await other.from("club_ffcv_cache").select("next_matches").eq("club_id", dbClub.id).maybeSingle()).data ?? null;
+    }
+  }
+  const raw = cacheRow?.next_matches;
+  if (Array.isArray(raw)) {
+    nextMatches = raw.filter((m: unknown): m is MatchItem => {
+      if (!m || typeof m !== "object" || Array.isArray(m)) return false;
+      const o = m as Record<string, unknown>;
+      return typeof o.local === "string" || typeof o.visitor === "string";
+    });
+  } else if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+    const single = raw as Record<string, unknown>;
+    if (typeof single.local === "string" || typeof single.visitor === "string") {
+      nextMatches = [raw as MatchItem];
+    }
+  }
+}
+
+// Agrupar por fecha (misma estructura que en inicio: fecha como título)
+const byDate = nextMatches.reduce<Record<string, MatchItem[]>>((acc, m) => {
+  const d = (m && typeof m === "object" && "date" in m && typeof (m as MatchItem).date === "string") ? (m as MatchItem).date : "Sin fecha";
+  if (!acc[d]) acc[d] = [];
+  acc[d].push(m);
+  return acc;
+}, {});
+const FAKE_DATE_KEYS = new Set(["date", "time", "local", "stadium", "visitor", "local_logo", "competition", "visitor_logo", "result"]);
+const matchdays = Object.entries(byDate)
+  .filter(([date]) => !FAKE_DATE_KEYS.has(String(date).toLowerCase()))
+  .map(([date, matches]) => ({ name: date, matches: Array.isArray(matches) ? matches : [] }));
+const hasMatches = matchdays.length > 0;
 ---
-<BaseLayout title={`Jornadas · ${clubName}`}>
-  <ClubHeader clubName={clubName} slug={slug} />
 
-  <section class="mt-8">
-    <h1 class="text-2xl font-bold mb-6">Jornadas</h1>
-
-    <div class="space-y-8">
-      {matchdays.map(day => (
-        <div>
-          <h2 class="font-semibold mb-3">{day.name}</h2>
-
-          <div class="space-y-2">
-            {day.matches.map(match => (
-              <div class="bg-white p-4 rounded shadow-sm flex justify-between">
-                <span>{match.team} vs {match.rival}</span>
-                <span class="font-medium">
-                  {match.result ?? "Pendiente"}
-                </span>
+<BaseLayout title={`Jornadas · ${club.name}`} color={club.color}>
+  <ClubHeader clubName={club.name} slug={slug} logoUrl={club.logo} pageVisibility={pageVisibility} />
+  <main class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <section class="club-page-hero">
+      <div class="club-page-hero__inner">
+        <div class="w-10 h-1 rounded-full mb-6" style="background: var(--club-color);" />
+        <h1>Jornadas</h1>
+        <p>Resultados y próximos partidos por jornada.</p>
+      </div>
+    </section>
+    <section class="club-page-body dark:bg-gray-800">
+      <div class="club-content py-12 sm:py-14">
+        {hasMatches ? (
+          <div class="jornadas-list" style="--club: var(--club-color, #1f2937);">
+            {matchdays.map((day) => (
+              <div class="jornadas-day">
+                <h2 class="jornadas-day__title">{day.name}</h2>
+                <div class="jornadas-day__cards">
+                  {day.matches.map((match) => typeof match === "object" && match !== null && (typeof (match as MatchItem).local === "string" || typeof (match as MatchItem).visitor === "string") ? (
+                    <article class="match-fixture">
+                      <div class="fixture-body">
+                        <div class="fixture-team fixture-team--local">
+                          <div class="fixture-team__crest">
+                            {match.local_logo ? <img src={match.local_logo} alt="" loading="lazy" /> : <span class="fixture-team__crest-placeholder" aria-hidden="true">{(match.local || "L").charAt(0).toUpperCase()}</span>}
+                          </div>
+                          <span class="fixture-team__name" title={match.local || "Local"}>{match.local || "Local"}</span>
+                        </div>
+                        <div class="fixture-divider">
+                          <span class="fixture-time">{match.result ?? (match.time && match.time !== "—" ? match.time : "Pendiente")}</span>
+                          <span class="fixture-vs">vs</span>
+                        </div>
+                        <div class="fixture-team fixture-team--visitor">
+                          <div class="fixture-team__crest">
+                            {match.visitor_logo ? <img src={match.visitor_logo} alt="" loading="lazy" /> : <span class="fixture-team__crest-placeholder" aria-hidden="true">{(match.visitor || "V").charAt(0).toUpperCase()}</span>}
+                          </div>
+                          <span class="fixture-team__name" title={match.visitor || "Visitante"}>{match.visitor || "Visitante"}</span>
+                        </div>
+                      </div>
+                      {(match.competition || match.stadium) ? (
+                        <footer class="fixture-meta">
+                          <span class="fixture-meta__icon" aria-hidden="true">⚽</span>
+                          <span class="fixture-meta__text">
+                            {[match.competition, match.stadium].filter(Boolean).join(" · ")}
+                          </span>
+                        </footer>
+                      ) : null}
+                    </article>
+                  ) : null)}
+                </div>
               </div>
             ))}
           </div>
-        </div>
-      ))}
-    </div>
-  </section>
+        ) : (
+          <p class="text-gray-600 dark:text-gray-400 text-center py-12">
+            No hay partidos cargados por el momento.
+          </p>
+        )}
+      </div>
+    </section>
+  </main>
+  <ClubFooter clubName={club.name} slug={slug} pageVisibility={pageVisibility} />
+
+  <style>
+    .jornadas-list { max-width: 52rem; margin: 0 auto; }
+    .jornadas-day { margin-bottom: 2.5rem; }
+    .jornadas-day:last-child { margin-bottom: 0; }
+    .jornadas-day__title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--club-color);
+      margin: 0 0 1rem;
+      text-transform: capitalize;
+    }
+    .jornadas-day__cards { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .match-fixture {
+      background: #fff;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+    :global(html[data-theme="dark"]) .match-fixture {
+      background: #1e293b;
+      border-color: #334155;
+    }
+    .match-fixture:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px -10px rgb(0 0 0 / 0.12);
+      border-color: color-mix(in srgb, var(--club) 35%, #e2e8f0);
+    }
+    .fixture-body {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      flex-wrap: wrap;
+    }
+    .fixture-team {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+      flex: 1 1 0;
+    }
+    .fixture-team--local { justify-content: flex-end; }
+    .fixture-team--visitor { justify-content: flex-start; }
+    .fixture-team__crest {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      border: 2px solid #e2e8f0;
+    }
+    .fixture-team__crest img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .fixture-team__crest-placeholder {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #64748b;
+      line-height: 1;
+    }
+    :global(html[data-theme="dark"]) .fixture-team__crest-placeholder {
+      background: linear-gradient(135deg, #475569, #334155);
+      color: #94a3b8;
+    }
+    .fixture-team__name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #1e293b;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    :global(html[data-theme="dark"]) .fixture-team__name { color: #e2e8f0; }
+    .fixture-divider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      flex-shrink: 0;
+      padding: 0.5rem 0.75rem;
+      background: #f8fafc;
+      border-radius: 0.75rem;
+      border: 1px solid #e2e8f0;
+      min-width: 4rem;
+    }
+    :global(html[data-theme="dark"]) .fixture-divider {
+      background: #334155;
+      border-color: #475569;
+    }
+    .fixture-time {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--club);
+      font-variant-numeric: tabular-nums;
+    }
+    .fixture-vs {
+      font-size: 0.6rem;
+      font-weight: 800;
+      color: #94a3b8;
+      letter-spacing: 0.12em;
+    }
+    .fixture-meta {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.35rem;
+      padding: 0.5rem 1.25rem 0.75rem;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      color: #64748b;
+    }
+    :global(html[data-theme="dark"]) .fixture-meta { color: #94a3b8; }
+    .fixture-meta__icon { font-size: 0.75rem; opacity: 0.9; flex-shrink: 0; margin-top: 0.1em; }
+    .fixture-meta__text {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      white-space: normal;
+    }
+  </style>
 </BaseLayout>
